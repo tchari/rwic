@@ -17,7 +17,7 @@ class Pick extends Entity {
       stockId: yup.number().integer().postive().required(),
       startDate: yup.date().required(),
       active: yup.bool(),
-    }).isValid(pick);
+    }).validateSync(pick);
   }
 }
 

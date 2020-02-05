@@ -15,7 +15,7 @@ class Stock extends Entity {
       name: yup.string().required(),
       ticker: yup.string().required(),
       exchange: yup.string().required(),
-    }).isValid(stock);
+    }).validateSync(stock);
   }
 }
 

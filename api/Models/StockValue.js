@@ -15,7 +15,7 @@ class StockValue extends Entity {
       stockId: yup.number().integer().postive().required(),
       value: yup.number().postive().required(),
       date: yup.date().required(),
-    }).isValid(stockValue);
+    }).validateSync(stockValue);
   }
 }
 

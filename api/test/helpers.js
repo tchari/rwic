@@ -59,9 +59,20 @@ function addTestPick(stockId, memberId, overrides) {
 }
 
 async function resetDb() {
-  for await (const table of Object.values(tables)) {
-    knex(table).del();
+  for (const table of Object.values(tables)) {
+    await knex(table).del();
   }
+}
+
+async function initDb() {
+  await knex.schema.dropTableIfExists(tables.PICK);
+  await knex.schema.dropTableIfExists(tables.STOCK_VALUE);
+  await knex.schema.dropTableIfExists(tables.MEMBER);
+  await knex.schema.dropTableIfExists(tables.STOCK);
+  await MemberQueries.init();
+  await StockQueries.init();
+  await PickQueries.init();
+  await StockValueQueries.init();
 }
 
 module.exports.addTestMember = addTestMember;
@@ -69,3 +80,4 @@ module.exports.addTestStock = addTestStock;
 module.exports.addTestStockValue = addTestStockValue;
 module.exports.addTestPick = addTestPick;
 module.exports.resetDb = resetDb;
+module.exports.initDb = initDb;

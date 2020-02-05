@@ -12,10 +12,10 @@ class Member extends Entity {
 
   validate(member) {
     yup.object().shape({
-      firstName: yup.string().required(),
-      lastName: yup.string().required(),
-      email: yup.email().required(),
-    }).isValid(member);
+      firstName: yup.string().strict().required(),
+      lastName: yup.string().strict().required(),
+      email: yup.string().email().required(),
+    }).validateSync(member);
   }
 }
 

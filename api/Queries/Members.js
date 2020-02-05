@@ -13,15 +13,22 @@ function init() {
 }
 
 async function addMember(member) {
-  const values = await knex(MEMBER).insert(member);
-  const memberId = values[0];
-  return memberId;
+  const result = await knex(MEMBER).insert(member)
+  return result[0];
+}
+
+async function getMember(memberId) {
+  const result = await knex(MEMBER)
+    .select()
+    .where({ id: memberId });
+  return result[0]; // should only have 1 result
 }
 
 function getAllMembers() {
-  return knex.select().from(MEMBER);
+  return knex(MEMBER).select();
 }
 
 module.exports.init = init;
 module.exports.addMember = addMember;
 module.exports.getAllMembers = getAllMembers;
+module.exports.getMember = getMember;
