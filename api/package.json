@@ -1,0 +1,26 @@
+{
+  "name": "riskywhiskyinvestments",
+  "version": "1.0.0",
+  "description": "Monitor investments over the year",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "author": "Tarun Chari",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "chai-as-promised": "^7.1.1",
+    "express": "^4.17.1",
+    "knex": "^0.20.8",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "mysql": "^2.18.1",
+    "yup": "^0.28.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.0.1"
+  }
+}
