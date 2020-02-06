@@ -15,8 +15,7 @@ function init() {
 
 async function addStock(stock) {
   const values = await knex(STOCK).insert(stock);
-  const stockId = values[0];
-  return stockId;
+  return values[0];
 }
 
 async function getStock(stockId) {
@@ -26,6 +25,7 @@ async function getStock(stockId) {
 
 async function getActiveStocks() {
   const activeStocks = await knex(STOCK)
+    .select(`${STOCK}.*`)
     .join(PICK, `${STOCK}.id`, '=', `${PICK}.stockId`)
     .where(`${PICK}.active`, true);
   return activeStocks;

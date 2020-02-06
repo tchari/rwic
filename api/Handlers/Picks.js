@@ -12,7 +12,7 @@ async function addPick(req, res) {
 }
 
 async function getPick(req, res) {
-  const { pickId } = req.params
+  const pickId = parseInt(req.params.pickId);
   try {
     const pickResult = await PickQueries.getPick(pickId);
     const pick = new Pick({
@@ -26,20 +26,20 @@ async function getPick(req, res) {
 }
 
 async function activatePick(req, res) {
-  const { pickId } = req.params
+  const pickId = parseInt(req.params.pickId);
   try {
-    const returnedPickId = await PickQueries.activatePick(pickId);
-    res.json({ id: returnedPickId });
+    await PickQueries.activatePick(pickId);
+    res.json({ id: pickId });
   } catch (e) {
     res.status(400).json({ message: `Failed to activate the pick with id ${pickId}.`, reason: e.message });
   }
 }
 
 async function deactivatePick(req, res) {
-  const { pickId } = req.params
+  const pickId = parseInt(req.params.pickId);
   try {
-    const returnedPickId = await PickQueries.deactivatePick(pickId);
-    res.json({ id: returnedPickId });
+    await PickQueries.deactivatePick(pickId);
+    res.json({ id: pickId });
   } catch (e) {
     res.status(400).json({ message: `Failed to deactivate the pick with id ${pickId}.`, reason: e.message });
   }

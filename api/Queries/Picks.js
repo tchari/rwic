@@ -39,11 +39,11 @@ async function getPick(pickId) {
 }
 
 async function deactivatePick(pickId) {
-  return await knex(PICK).update({ active: false }).where({ id: pickId });
+  await knex(PICK).update({ active: false }).where({ id: pickId });
 }
 
 async function activatePick(pickId) {
-  return await knex(PICK).update({ active: true }).where({ id: pickId });
+  await knex(PICK).update({ active: true }).where({ id: pickId });
 }
 
 module.exports.init = init;
