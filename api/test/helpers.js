@@ -5,6 +5,16 @@ const StockValueQueries = require('../Queries/StockValues');
 const PickQueries = require('../Queries/Picks');
 const tables = require('../Queries/tables');
 
+/**
+ * Add a member
+ *
+ * @param {Object} overrides overrides object
+ * @param {string} overrides.firstName member's first name
+ * @param {string} overrides.lastName member's last name
+ * @param {string} overrides.email member's email address
+ * 
+ * @return {Promise} promise that should resolve with the added member
+ */
 function addTestMember(overrides = {}) {
   const defaults = {
     firstName: 'testFirstName',
@@ -18,6 +28,16 @@ function addTestMember(overrides = {}) {
   return MemberQueries.addMember(params);
 }
 
+/**
+ * Add a stock
+ *
+ * @param {Object} overrides overrides object
+ * @param {string} overrides.name stock name
+ * @param {string} overrides.ticker stock ticker symbol
+ * @param {string} overrides.exchange stock's exchange
+ * 
+ * @return {Promise} promise that should resolve with the added stock
+ */
 function addTestStock(overrides = {}) {
   const defaults = {
     name: 'Tesla, Inc.',
@@ -31,6 +51,16 @@ function addTestStock(overrides = {}) {
   return StockQueries.addStock(params);
 }
 
+/**
+ * Add a value for a stock
+ *
+ * @param {number} stockId the id of the stock this stock value belongs to
+ * @param {Object} overrides overrides object
+ * @param {string} overrides.value close price (value) of the stock
+ * @param {string} overrides.date date of this stock value
+ * 
+ * @return {Promise} promise that should resolve with the added stock value
+ */
 function addTestStockValue(stockId, overrides = {}) {
   const defaults = {
     value: 123.32,
@@ -44,6 +74,17 @@ function addTestStockValue(stockId, overrides = {}) {
   return StockValueQueries.addStockValue(params);
 }
 
+/**
+ * Add a pick for a stock and a member
+ *
+ * @param {number} stockId the id of the stock that is picked
+ * @param {number} memberId the id of the member that picked
+ * @param {Object} overrides overrides object
+ * @param {Date} overrides.startDate the date this stock was picked (n.b. NOT created!)
+ * @param {string} overrides.ratio the selection ratio of this pick to the rest of the member's active picks for the year
+ * 
+ * @return {Promise} promise that should resolve with the added pick
+ */
 function addTestPick(stockId, memberId, overrides = {}) {
   const defaults = {
     startDate: new Date(),
@@ -58,6 +99,9 @@ function addTestPick(stockId, memberId, overrides = {}) {
   return PickQueries.addPick(params);
 }
 
+/**
+ * Delete all the data from all the tables
+ */
 async function resetDb() {
   await knex(tables.PICK).del();
   await knex(tables.STOCK_VALUE).del();
@@ -65,6 +109,9 @@ async function resetDb() {
   await knex(tables.STOCK).del();
 }
 
+/**
+ * Drop all tables and re-initialize (used when the schema changes)
+ */
 async function initDb() {
   await knex.schema.dropTableIfExists(tables.PICK);
   await knex.schema.dropTableIfExists(tables.STOCK_VALUE);

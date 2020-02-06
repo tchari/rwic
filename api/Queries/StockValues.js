@@ -23,8 +23,9 @@ async function addStockValue(stockValue) {
 }
 
 async function addStockValues(stockValues) {
-  const numadded = await knex(STOCK_VALUE).insert(stockValues);
-  const added = await knex(STOCK_VALUE).select().whereRaw('id >= last_insert_id() and id < last_insert_id + ?', [numadded[0]]);
+  const result = await knex(STOCK_VALUE).insert(stockValues);
+  const firstId = result[0];
+  const added = await knex(STOCK_VALUE).select().whereRaw('id >= ? and id < ?', [firstId, firstId + stockValues.length]);
   return added.map(sv => new StockValue(sv));
 }
 
