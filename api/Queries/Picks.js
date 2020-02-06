@@ -28,11 +28,26 @@ async function addPick(pick) {
   return pickId;
 }
 
+/**
+ * Get a pick
+ *
+ * @param {object} pick 
+ */
+async function getPick(pickId) {
+  const result = await knex(PICK).select().where({ id: pickId });
+  return result[0];
+}
+
 async function deactivatePick(pickId) {
-  await knex(PICK).update({ active: false }).where('id', pickId);
-  return;
+  return await knex(PICK).update({ active: false }).where({ id: pickId });
+}
+
+async function activatePick(pickId) {
+  return await knex(PICK).update({ active: true }).where({ id: pickId });
 }
 
 module.exports.init = init;
 module.exports.addPick = addPick;
+module.exports.getPick = getPick;
 module.exports.deactivatePick = deactivatePick;
+module.exports.activatePick = activatePick;

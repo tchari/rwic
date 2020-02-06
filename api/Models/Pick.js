@@ -9,14 +9,16 @@ class Pick extends Entity {
     this.stockId = pick.stockId;
     this.startDate = pick.startDate;
     this.active = pick.active;
+    this.ratio = pick.ratio;
   }
 
   validate(pick) {
     yup.object().shape({
-      memberId: yup.number().integer().postive().required(),
-      stockId: yup.number().integer().postive().required(),
+      memberId: yup.number().integer().positive().required(),
+      stockId: yup.number().integer().positive().required(),
+      ratio: yup.number().positive().max(1).required(),
       startDate: yup.date().required(),
-      active: yup.bool(),
+      active: yup.bool().strict(),
     }).validateSync(pick);
   }
 }

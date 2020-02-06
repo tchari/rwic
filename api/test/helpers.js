@@ -5,7 +5,7 @@ const StockValueQueries = require('../Queries/StockValues');
 const PickQueries = require('../Queries/Picks');
 const tables = require('../Queries/tables');
 
-function addTestMember(overrides) {
+function addTestMember(overrides = {}) {
   const defaults = {
     firstName: 'testFirstName',
     lastName: 'testLastName',
@@ -18,7 +18,7 @@ function addTestMember(overrides) {
   return MemberQueries.addMember(params);
 }
 
-function addTestStock(overrides) {
+function addTestStock(overrides = {}) {
   const defaults = {
     name: 'Tesla, Inc.',
     ticker: 'TSLA',
@@ -31,7 +31,7 @@ function addTestStock(overrides) {
   return StockQueries.addStock(params);
 }
 
-function addTestStockValue(stockId, overrides) {
+function addTestStockValue(stockId, overrides = {}) {
   const defaults = {
     value: 123.32,
     date: new Date(),
@@ -44,7 +44,7 @@ function addTestStockValue(stockId, overrides) {
   return StockValueQueries.addStockValue(params);
 }
 
-function addTestPick(stockId, memberId, overrides) {
+function addTestPick(stockId, memberId, overrides = {}) {
   const defaults = {
     startDate: new Date(),
     ratio: 1,
@@ -59,9 +59,10 @@ function addTestPick(stockId, memberId, overrides) {
 }
 
 async function resetDb() {
-  for (const table of Object.values(tables)) {
-    await knex(table).del();
-  }
+  await knex(tables.PICK).del();
+  await knex(tables.STOCK_VALUE).del();
+  await knex(tables.MEMBER).del();
+  await knex(tables.STOCK).del();
 }
 
 async function initDb() {

@@ -18,9 +18,7 @@ async function addMember(member) {
 }
 
 async function getMember(memberId) {
-  const result = await knex(MEMBER)
-    .select()
-    .where({ id: memberId });
+  const result = await knex(MEMBER).select().where({ id: memberId });
   return result[0]; // should only have 1 result
 }
 

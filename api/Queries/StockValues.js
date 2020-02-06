@@ -31,8 +31,7 @@ async function addStockValue(stockValue) {
  * join MEMBER m on m.id = p.memberId
  * where date = today and date = thisYearStartDate and pick.active = true
  */
-async function getYearToDateLeaderboard() {
-  const today = moment().startOf('day').toDate()
+async function getYearToDateLeaderboard(today) {
   const startDate = moment(config.thisYearStartDate).toDate();
   const results = await knex(STOCK_VALUE)
     .join(STOCK, `${STOCK_VALUE}.stockId`, '=', `${STOCK}.id`)
@@ -44,6 +43,7 @@ async function getYearToDateLeaderboard() {
       'value',
       `${STOCK_VALUE}.stockId`,
       'date',
+      `${PICK}.id as pickId`,
       `${PICK}.memberId`,
       `${MEMBER}.firstName`,
       `${MEMBER}.lastName`,

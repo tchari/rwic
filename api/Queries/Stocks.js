@@ -1,7 +1,7 @@
 const knex = require('./initConnection');
 const tables = require('./tables');
 
-const { STOCK, PICKS } = tables;
+const { STOCK, PICK } = tables;
 
 function init() {
   return knex.schema.createTable(STOCK, function (table) {
@@ -19,14 +19,19 @@ async function addStock(stock) {
   return stockId;
 }
 
+async function getStock(stockId) {
+  const result = await knex(STOCK).select().where({ id: stockId });
+  return result[0]; // should only have 1 result
+}
+
 async function getActiveStocks() {
-  const activeStocks = await knex.select()
-    .from(STOCK)
-    .innerJoin(PICKS, `${STOCK}.id`, `${PICKS}.stock_id`)
-    .where(`${PICKS}.active`, true);
+  const activeStocks = await knex(STOCK)
+    .join(PICK, `${STOCK}.id`, '=', `${PICK}.stockId`)
+    .where(`${PICK}.active`, true);
   return activeStocks;
 }
 
 module.exports.init = init;
 module.exports.addStock = addStock;
+module.exports.getStock = getStock;
 module.exports.getActiveStocks = getActiveStocks;

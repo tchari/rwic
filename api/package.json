@@ -4,7 +4,8 @@
   "description": "Monitor investments over the year",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "mocha --recursive",
+    "lint": "eslint"
   },
   "author": "Tarun Chari",
   "license": "ISC",

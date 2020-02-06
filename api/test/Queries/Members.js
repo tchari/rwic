@@ -1,6 +1,5 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const initDb = require('../../Queries/initDatabase');
 const MemberQueries = require('../../Queries/Members');
 const helpers = require('../helpers');
 chai.use(chaiAsPromised);
@@ -8,7 +7,7 @@ const { assert, expect } = chai;
 
 describe('Members', function() {
   before(async function() {
-    await initDb();
+    await helpers.initDb();
   });
   afterEach(async function() {
     await helpers.resetDb();

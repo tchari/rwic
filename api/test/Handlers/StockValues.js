@@ -1,43 +1,31 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+const chaiHttp = require('chai-http');
 const moment = require('moment');
+const find = require('lodash/find');
 
 const config = require('../../config.json');
-const StockValueQueries = require('../../Queries/StockValues');
+const app = require('../../app');
 const helpers = require('../helpers');
-chai.use(chaiAsPromised);
-const { assert, expect } = chai;
 
-describe('StockValues', function() {
+chai.use(chaiAsPromised);
+chai.use(chaiHttp);
+const { expect } = chai;
+
+describe('StockValue EndPoints', function() {
   before(async function() {
     await helpers.initDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
   });
-  describe('Successfully Add Stock Value', function() {
-    let stockId;
-    before(async function () {
-      stockId = await helpers.addTestStock();
-    });
-    it('should return the stockValueId', function() {
-      StockValueQueries.addStockValue({
-        stockId,
-        value: 123.32,
-        date: new Date(),
-      }).then(stockValueId => {
-        assert.isNumber(stockValueId);
-        expect(stockValueId).to.be.above(0);
-      });
-    });
-  });
-  describe('Get Year-to-Date Leaderboard data', function() {
+  describe('Get leaderboard', function () {
     let teslaId;
     let appleId;
     let microsoftId;
     let bobId;
     let joeyId;
-    before(async function () {
+    before(async function() {
       const startDate = moment(config.thisYearStartDate).toDate();
       const yesterday = moment().subtract(1, 'day').startOf('day').toDate();
       const now = moment().startOf('day').toDate();
@@ -107,18 +95,20 @@ describe('StockValues', function() {
       await helpers.addTestPick(appleId, joeyId, { startDate, ratio: 0.5 });
       await helpers.addTestPick(microsoftId, joeyId, { startDate, ratio: 0.5 });
     });
-    it('should return the 8 results of leader board info', async function() {
-      const results = await StockValueQueries.getYearToDateLeaderboard();
-      expect(results.length).eql(8);
-      results.forEach(result => {
-        expect(result).to.have.property('value');
-        expect(result).to.have.property('stockId');
-        expect(result).to.have.property('date');
-        expect(result).to.have.property('memberId');
-        expect(result).to.have.property('firstName');
-        expect(result).to.have.property('lastName');
-        expect(result).to.have.property('ratio');
-      });
+    it('should return the leaderboard', async function() {
+      const response = await chai.request(app).get('/leaderboard');
+      expect(response.status).to.eql(200);
+      expect(response.body.leaderboard).to.exist;
+      expect(response.body.leaderboard.length).to.eql(2);
+      const { leaderboard } = response.body;
+      const bob = find(leaderboard, { memberId: bobId });
+      expect(bob.firstName).to.eql('Bob');
+      expect(bob.lastName).to.eql('Loblaw');
+      expect(bob.increase).to.eql(1);
+      const joey = find(leaderboard, { memberId: joeyId });
+      expect(joey.firstName).to.eql('Joey');
+      expect(joey.lastName).to.eql('Shabidoo');
+      expect(joey.increase).to.eql(0.25);
     });
   });
 });
