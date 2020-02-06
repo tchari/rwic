@@ -20,80 +20,80 @@ describe('StockValue EndPoints', function() {
     await helpers.resetDb();
   });
   describe('Get leaderboard', function () {
-    let teslaId;
-    let appleId;
-    let microsoftId;
-    let bobId;
-    let joeyId;
+    let tesla;
+    let apple;
+    let microsoft;
+    let bob;
+    let joey;
     before(async function() {
       const startDate = moment(config.thisYearStartDate).toDate();
       const yesterday = moment().subtract(1, 'day').startOf('day').toDate();
       const now = moment().startOf('day').toDate();
-      teslaId = await helpers.addTestStock({
+      tesla = await helpers.addTestStock({
         name: 'Tesla, Inc.',
         ticker: 'TSLA',
         exchange: 'NASDAQ',
       });
-      await helpers.addTestStockValue(teslaId, {
+      await helpers.addTestStockValue(tesla.id, {
         value: 1,
         date: startDate,
       });
-      await helpers.addTestStockValue(teslaId, {
+      await helpers.addTestStockValue(tesla.id, {
         value: 1.5,
         date: yesterday,
       });
-      await helpers.addTestStockValue(teslaId, {
+      await helpers.addTestStockValue(tesla.id, {
         value: 2,
         date: now,
       });
-      appleId = await helpers.addTestStock({
+      apple = await helpers.addTestStock({
         name: 'Apple, Inc.',
         ticker: 'AAPL',
         exchange: 'NASDAQ',
       });
-      await helpers.addTestStockValue(appleId, {
+      await helpers.addTestStockValue(apple.id, {
         value: 10,
         date: startDate,
       });
-      await helpers.addTestStockValue(appleId, {
+      await helpers.addTestStockValue(apple.id, {
         value: 15,
         date: yesterday,
       });
-      await helpers.addTestStockValue(appleId, {
+      await helpers.addTestStockValue(apple.id, {
         value: 20,
         date: now,
       });
-      microsoftId = await helpers.addTestStock({
+      microsoft = await helpers.addTestStock({
         name: 'Microsoft Corporation',
         ticker: 'MFST',
         exchange: 'NASDAQ',
       });
-      await helpers.addTestStockValue(microsoftId, {
+      await helpers.addTestStockValue(microsoft.id, {
         value: 200,
         date: startDate,
       });
-      await helpers.addTestStockValue(microsoftId, {
+      await helpers.addTestStockValue(microsoft.id, {
         value: 150,
         date: yesterday,
       });
-      await helpers.addTestStockValue(microsoftId, {
+      await helpers.addTestStockValue(microsoft.id, {
         value: 100,
         date: now,
       });
-      bobId = await helpers.addTestMember({
+      bob = await helpers.addTestMember({
         firstName: 'Bob',
         lastName: 'Loblaw',
         email: 'blah@blah.blah',
       });
-      joeyId = await helpers.addTestMember({
+      joey = await helpers.addTestMember({
         firstName: 'Joey',
         lastName: 'Shabidoo',
         email: 'joey@joejoe.shabidoo',
       });
-      await helpers.addTestPick(teslaId, bobId, { startDate, ratio: 0.25 });
-      await helpers.addTestPick(appleId, bobId, { startDate, ratio: 0.75 });
-      await helpers.addTestPick(appleId, joeyId, { startDate, ratio: 0.5 });
-      await helpers.addTestPick(microsoftId, joeyId, { startDate, ratio: 0.5 });
+      await helpers.addTestPick(tesla.id, bob.id, { startDate, ratio: 0.25 });
+      await helpers.addTestPick(apple.id, bob.id, { startDate, ratio: 0.75 });
+      await helpers.addTestPick(apple.id, joey.id, { startDate, ratio: 0.5 });
+      await helpers.addTestPick(microsoft.id, joey.id, { startDate, ratio: 0.5 });
     });
     it('should return the leaderboard', async function() {
       const response = await chai.request(app).get('/leaderboard');
@@ -101,14 +101,14 @@ describe('StockValue EndPoints', function() {
       expect(response.body.leaderboard).to.exist;
       expect(response.body.leaderboard.length).to.eql(2);
       const { leaderboard } = response.body;
-      const bob = find(leaderboard, { memberId: bobId });
-      expect(bob.firstName).to.eql('Bob');
-      expect(bob.lastName).to.eql('Loblaw');
-      expect(bob.increase).to.eql(1);
-      const joey = find(leaderboard, { memberId: joeyId });
-      expect(joey.firstName).to.eql('Joey');
-      expect(joey.lastName).to.eql('Shabidoo');
-      expect(joey.increase).to.eql(0.25);
+      const foundBob = find(leaderboard, { memberId: bob.id });
+      expect(foundBob.firstName).to.eql('Bob');
+      expect(foundBob.lastName).to.eql('Loblaw');
+      expect(foundBob.increase).to.eql(1);
+      const foundJoey = find(leaderboard, { memberId: joey.id });
+      expect(foundJoey.firstName).to.eql('Joey');
+      expect(foundJoey.lastName).to.eql('Shabidoo');
+      expect(foundJoey.increase).to.eql(0.25);
     });
   });
 });

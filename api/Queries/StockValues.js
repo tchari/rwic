@@ -2,6 +2,7 @@ const moment = require('moment');
 const knex = require('./initConnection');
 const tables = require('./tables');
 const config = require('../config.json');
+const StockValue = require('../Models/StockValue');
 
 const { STOCK_VALUE, STOCK, PICK, MEMBER } = tables;
 
@@ -16,9 +17,15 @@ function init() {
 }
 
 async function addStockValue(stockValue) {
-  const values = await knex(STOCK_VALUE).insert(stockValue);
-  const stockValueId = values[0];
-  return stockValueId;
+  await knex(STOCK_VALUE).insert(stockValue);
+  const added = await knex(STOCK_VALUE).select().whereRaw('id = last_insert_id()');
+  return new StockValue(added[0]);
+}
+
+async function addStockValues(stockValues) {
+  const numadded = await knex(STOCK_VALUE).insert(stockValues);
+  const added = await knex(STOCK_VALUE).select().whereRaw('id >= last_insert_id() and id < last_insert_id + ?', [numadded[0]]);
+  return added.map(sv => new StockValue(sv));
 }
 
 /**
@@ -54,4 +61,5 @@ async function getYearToDateLeaderboard(today) {
 
 module.exports.init = init;
 module.exports.addStockValue = addStockValue;
+module.exports.addStockValues = addStockValues;
 module.exports.getYearToDateLeaderboard = getYearToDateLeaderboard;

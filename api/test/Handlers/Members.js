@@ -11,13 +11,13 @@ const { expect } = chai;
 
 describe('Member EndPoints', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
   });
   describe('Add Member', function () {
-    it('should return the memberId', async function () {
+    it('should return the member', async function () {
       const response = await chai
         .request(app)
         .post('/members')
@@ -28,12 +28,17 @@ describe('Member EndPoints', function() {
         });
       expect(response.status).to.eql(200);
       expect(response.body.id).to.exist;
+      expect(response.body.created_at).to.exist;
+      expect(response.body.updated_at).to.exist;
+      expect(response.body.email).to.eql('blah@blah.blah');
+      expect(response.body.lastName).to.eql('Loblaw');
+      expect(response.body.firstName).to.eql('Bob');
     });
   });
   describe('Get a member', function () {
-    let memberId;
+    let member;
     before(async function() {
-      memberId = await helpers.addTestMember({
+      member = await helpers.addTestMember({
         email: 'some.test@user.com',
         lastName: 'Test',
         firstName: 'Some',
@@ -42,9 +47,9 @@ describe('Member EndPoints', function() {
     it('should return the member entity', async function () {
       const response = await chai
         .request(app)
-        .get(`/members/${memberId}`);
+        .get(`/members/${member.id}`);
       expect(response.status).to.eql(200);
-      expect(response.body.id).to.eql(memberId);
+      expect(response.body.id).to.eql(member.id);
       expect(response.body.email).to.eql('some.test@user.com');
       expect(response.body.lastName).to.eql('Test');
       expect(response.body.firstName).to.eql('Some');

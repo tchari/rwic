@@ -18,18 +18,18 @@ describe('Pick EndPoints', function() {
     await helpers.resetDb();
   });
   describe('Add Pick', function () {
-    let memberId;
-    let stockId;
+    let member;
+    let stock;
     before(async function () {
-      memberId = await helpers.addTestMember();
-      stockId = await helpers.addTestStock();
+      member = await helpers.addTestMember();
+      stock = await helpers.addTestStock();
     });
     it('should return a pick id', async function () {
       const response = await chai.request(app)
         .post('/picks')
         .send({
-          memberId,
-          stockId,
+          memberId: member.id,
+          stockId: stock.id,
           startDate: moment().startOf('day').toDate(),
           ratio: 0.12,
         });
@@ -38,22 +38,22 @@ describe('Pick EndPoints', function() {
     });
   });
   describe('Get a Pick', function () {
-    let pickId;
-    let memberId;
-    let stockId;
+    let pick;
+    let member;
+    let stock;
     const startDate = moment().startOf('day');
     before(async function () {
-      memberId = await helpers.addTestMember();
-      stockId = await helpers.addTestStock();
-      pickId = await helpers.addTestPick(stockId, memberId, { ratio: 0.1, startDate: startDate.toDate() });
+      member = await helpers.addTestMember();
+      stock = await helpers.addTestStock();
+      pick = await helpers.addTestPick(stock.id, member.id, { ratio: 0.1, startDate: startDate.toDate() });
     });
     it('should return a pick', async function () {
-      const response = await chai.request(app).get(`/picks/${pickId}`);
+      const response = await chai.request(app).get(`/picks/${pick.id}`);
       expect(response.status).to.eql(200);
-      expect(response.body.id).to.eql(pickId);
+      expect(response.body.id).to.eql(pick.id);
       expect(response.body.active).to.be.true;
-      expect(response.body.memberId).to.eql(memberId);
-      expect(response.body.stockId).to.eql(stockId);
+      expect(response.body.memberId).to.eql(member.id);
+      expect(response.body.stockId).to.eql(stock.id);
       expect(response.body.ratio).to.eql(0.1);
       expect(response.body.startDate).to.exist;
       const actualTs = moment(response.body.startDate).valueOf();
@@ -62,33 +62,33 @@ describe('Pick EndPoints', function() {
     });
   });
   describe('Deactivate a Pick', function () {
-    let pickId;
+    let pick;
     before(async function () {
-      const memberId = await helpers.addTestMember();
-      const stockId = await helpers.addTestStock();
-      pickId = await helpers.addTestPick(stockId, memberId);
+      const member = await helpers.addTestMember();
+      const stock = await helpers.addTestStock();
+      pick = await helpers.addTestPick(stock.id, member.id);
     });
     it('should return a pickId', async function () {
-      const deactivateResponse = await chai.request(app).patch(`/picks/${pickId}/deactivate`);
+      const deactivateResponse = await chai.request(app).patch(`/picks/${pick.id}/deactivate`);
       expect(deactivateResponse.status).to.eql(200);
-      expect(deactivateResponse.body.id).to.eql(pickId);
-      const pickResponse = await chai.request(app).get(`/picks/${pickId}`);
+      expect(deactivateResponse.body.id).to.eql(pick.id);
+      const pickResponse = await chai.request(app).get(`/picks/${pick.id}`);
       expect(pickResponse.body.active).to.be.false;
     });
   });
   describe('Activate a Pick', function () {
-    let pickId;
+    let pick;
     before(async function () {
-      const memberId = await helpers.addTestMember();
-      const stockId = await helpers.addTestStock();
-      pickId = await helpers.addTestPick(stockId, memberId);
-      await chai.request(app).patch(`/picks/${pickId}/deactivate`);
+      const member = await helpers.addTestMember();
+      const stock = await helpers.addTestStock();
+      pick = await helpers.addTestPick(stock.id, member.id);
+      await chai.request(app).patch(`/picks/${pick.id}/deactivate`);
     });
     it('should return a pickId', async function () {
-      const deactivateResponse = await chai.request(app).patch(`/picks/${pickId}/activate`);
+      const deactivateResponse = await chai.request(app).patch(`/picks/${pick.id}/activate`);
       expect(deactivateResponse.status).to.eql(200);
-      expect(deactivateResponse.body.id).to.eql(pickId);
-      const pickResponse = await chai.request(app).get(`/picks/${pickId}`);
+      expect(deactivateResponse.body.id).to.eql(pick.id);
+      const pickResponse = await chai.request(app).get(`/picks/${pick.id}`);
       expect(pickResponse.body.active).to.be.true;
     });
   });

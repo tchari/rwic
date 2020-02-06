@@ -1,5 +1,6 @@
 const knex = require('./initConnection');
 const tables = require('./tables');
+const Member = require('../Models/Member');
 
 const { MEMBER } = tables;
 function init() {
@@ -13,8 +14,9 @@ function init() {
 }
 
 async function addMember(member) {
-  const result = await knex(MEMBER).insert(member)
-  return result[0];
+  await knex(MEMBER).insert(member);
+  const added = await knex(MEMBER).select().whereRaw('id = last_insert_id()');
+  return new Member(added[0]);
 }
 
 async function getMember(memberId) {

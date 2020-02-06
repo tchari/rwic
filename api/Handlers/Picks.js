@@ -4,8 +4,8 @@ const PickQueries = require('../Queries/Picks');
 async function addPick(req, res) {
   try {
     const pick = new Pick(req.body);
-    const pickId = await PickQueries.addPick({ ...pick, startDate: new Date(pick.startDate) });
-    res.json({ id: pickId });
+    const newPick = await PickQueries.addPick({ ...pick, startDate: new Date(pick.startDate) });
+    res.json(newPick);
   } catch (e) {
     res.status(400).json({ message: 'Failed to add new pick.', reason: e.message });
   }

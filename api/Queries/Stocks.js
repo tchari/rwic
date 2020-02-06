@@ -1,5 +1,6 @@
 const knex = require('./initConnection');
 const tables = require('./tables');
+const Stock = require('../Models/Stock');
 
 const { STOCK, PICK } = tables;
 
@@ -14,8 +15,9 @@ function init() {
 }
 
 async function addStock(stock) {
-  const values = await knex(STOCK).insert(stock);
-  return values[0];
+  await knex(STOCK).insert(stock);
+  const added = await knex(STOCK).select().whereRaw('id = last_insert_id()');
+  return new Stock(added[0]);
 }
 
 async function getStock(stockId) {
@@ -24,11 +26,11 @@ async function getStock(stockId) {
 }
 
 async function getActiveStocks() {
-  const activeStocks = await knex(STOCK)
+  return await knex(STOCK)
     .select(`${STOCK}.*`)
     .join(PICK, `${STOCK}.id`, '=', `${PICK}.stockId`)
-    .where(`${PICK}.active`, true);
-  return activeStocks;
+    .where(`${PICK}.active`, true)
+    .groupBy(`${STOCK}.id`);
 }
 
 module.exports.init = init;

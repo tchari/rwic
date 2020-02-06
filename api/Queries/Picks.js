@@ -1,5 +1,6 @@
 const knex = require('./initConnection');
 const tables = require('./tables');
+const Pick = require('../Models/Pick');
 
 const { PICK, MEMBER, STOCK } = tables;
 
@@ -23,9 +24,10 @@ function init() {
  * @param {object} pick 
  */
 async function addPick(pick) {
-  const values = await knex(PICK).insert({ ...pick, active: true });
-  const pickId = values[0];
-  return pickId;
+  await knex(PICK).insert({ ...pick, active: true });
+  const result = await knex(PICK).select().whereRaw('id = last_insert_id()');
+  const newPick = result[0];
+  return new Pick({ ...newPick, active: newPick.active ? true : false});
 }
 
 /**

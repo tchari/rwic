@@ -3,24 +3,31 @@ const chaiAsPromised = require('chai-as-promised');
 const StockQueries = require('../../Queries/Stocks');
 const helpers = require('../helpers');
 chai.use(chaiAsPromised);
-const { assert, expect } = chai;
+const { expect } = chai;
 
-describe('Stocks', function() {
+describe('Stock Queries', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
   });
   describe('Successfully Add Stock', function() {
-    it('should return the stockId', function() {
+    it('should return the stockId', function(done) {
       StockQueries.addStock({
         name: 'Tesla, Inc.',
         ticker: 'TSLA',
         exchange: 'NASDAQ',
-      }).then(stockId => {
-        assert.isNumber(stockId);
-        expect(stockId).to.be.above(0);
+      }).then(stock => {
+        expect(stock.id).to.be.above(0);
+        expect(stock.created_at).to.exist;
+        expect(stock.updated_at).to.exist;
+        expect(stock.name).to.eql('Tesla, Inc.');
+        expect(stock.ticker).to.eql('TSLA');
+        expect(stock.exchange).to.eql('NASDAQ');
+        done();
+      }).catch(e => {
+        done(e);
       });
     });
   });

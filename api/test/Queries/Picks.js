@@ -3,31 +3,37 @@ const chaiAsPromised = require('chai-as-promised');
 const PickQueries = require('../../Queries/Picks');
 const helpers = require('../helpers');
 chai.use(chaiAsPromised);
-const { assert, expect } = chai;
+const { expect } = chai;
 
-describe('Picks', function() {
+describe('Pick Queries', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
   });
   describe('Successfully Add Pick', function() {
-    let stockId;
-    let memberId;
+    let stock;
+    let member;
     before(async function () {
-      stockId = await helpers.addTestStock();
-      memberId = await helpers.addTestMember();
+      stock = await helpers.addTestStock();
+      member = await helpers.addTestMember();
     });
-    it('should return the PickId', function() {
+    it('should return the PickId', function(done) {
       PickQueries.addPick({
-        stockId,
-        memberId,
+        stockId: stock.id,
+        memberId: member.id,
         ratio: 1,
         startDate: new Date(),
-      }).then(pickId => {
-        assert.isNumber(pickId);
-        expect(pickId).to.be.above(0);
+      }).then(pick => {
+        expect(pick.id).to.be.above(0);
+        expect(pick.created_at).to.exist;
+        expect(pick.updated_at).to.exist;
+        expect(pick.ratio).to.eql(1);
+        expect(pick.startDate).to.exist;
+        done();
+      }).catch(e => {
+        done(e);
       });
     });
   });

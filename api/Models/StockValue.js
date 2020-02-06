@@ -12,8 +12,8 @@ class StockValue extends Entity {
 
   validate(stockValue) {
     yup.object().shape({
-      stockId: yup.number().integer().postive().required(),
-      value: yup.number().postive().required(),
+      stockId: yup.number().integer().positive().required(),
+      value: yup.number().positive().required(),
       date: yup.date().required(),
     }).validateSync(stockValue);
   }

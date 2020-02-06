@@ -4,8 +4,8 @@ const StockQueries = require('../Queries/Stocks');
 async function addStock(req, res) {
   try {
     const stock = new Stock(req.body);
-    const stockId = await StockQueries.addStock(stock);
-    res.json({ id: stockId });
+    const newStock = await StockQueries.addStock(stock);
+    res.json(newStock);
   } catch (e) {
     res.status(400).json({ message: 'Failed to add new stock.', reason: e.message });
   }

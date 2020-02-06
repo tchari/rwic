@@ -4,28 +4,33 @@ const chaiAsPromised = require('chai-as-promised');
 const StockValueQueries = require('../../Queries/StockValues');
 const helpers = require('../helpers');
 chai.use(chaiAsPromised);
-const { assert, expect } = chai;
+const { expect } = chai;
 
-describe('StockValues', function() {
+describe('StockValue Queries', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
   });
   describe('Successfully Add Stock Value', function() {
-    let stockId;
+    let stock;
     before(async function () {
-      stockId = await helpers.addTestStock();
+      stock = await helpers.addTestStock();
     });
-    it('should return the stockValueId', function() {
+    it('should return the stockValueId', function(done) {
       StockValueQueries.addStockValue({
-        stockId,
+        stockId: stock.id,
         value: 123.32,
         date: new Date(),
-      }).then(stockValueId => {
-        assert.isNumber(stockValueId);
-        expect(stockValueId).to.be.above(0);
+      }).then(stockValue => {
+        expect(stockValue.id).to.be.above(0);
+        expect(stockValue.value).to.eql(123.32);
+        expect(stockValue.date).to.exist;
+        expect(stockValue.stockId).to.eql(stock.id);
+        done();
+      }).catch(e => {
+        done(e);
       });
     });
   });

@@ -4,8 +4,8 @@ const MemberQueries = require('../Queries/Members');
 async function addMember(req, res) {
   try {
     const member = new Member(req.body);
-    const memberId = await MemberQueries.addMember(member);
-    res.json({ id: memberId });
+    const newMember = await MemberQueries.addMember(member);
+    res.json(newMember);
   } catch (e) {
     res.status(400).json({ message: 'Failed to add new member.', reason: e.message });
   }

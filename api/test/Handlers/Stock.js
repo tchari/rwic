@@ -13,7 +13,7 @@ const { expect } = chai;
 
 describe('Stock EndPoints', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
@@ -29,21 +29,24 @@ describe('Stock EndPoints', function() {
         });
       expect(response.status).to.eql(200);
       expect(response.body.id).to.exist;
+      expect(response.body.name).to.eql('Blarg, Inc.');
+      expect(response.body.ticker).to.eql('BLRG');
+      expect(response.body.exchange).to.eql('BLARGITYBLARG');
     });
   });
   describe('Get a stock', function () {
-    let stockId;
+    let stock;
     before(async function () {
-      stockId = await helpers.addTestStock({
+      stock = await helpers.addTestStock({
         name: 'Acme, Inc.',
         ticker: 'ACME',
         exchange: 'XCNGE'
       });
     });
     it('should return the stock id', async function () {
-      const response = await chai.request(app).get(`/stocks/${stockId}`);
+      const response = await chai.request(app).get(`/stocks/${stock.id}`);
       expect(response.status).to.eql(200);
-      expect(response.body.id).to.eql(stockId);
+      expect(response.body.id).to.eql(stock.id);
       expect(response.body.created_at).to.exist;
       expect(response.body.updated_at).to.exist;
       expect(response.body.name).to.eql('Acme, Inc.');
@@ -52,40 +55,40 @@ describe('Stock EndPoints', function() {
     });
   });
   describe('Get active stocks', function () {
-    let acmeId;
-    let otherId;
-    let unusedId;
-    let memberId;
+    let acme;
+    let other;
+    let unused;
+    let member;
     before(async function () {
-      memberId = await helpers.addTestMember();
-      acmeId = await helpers.addTestStock({
+      member = await helpers.addTestMember();
+      acme = await helpers.addTestStock({
         name: 'Acme, Inc.',
         ticker: 'ACME',
         exchange: 'XCNGE'
       });
-      otherId = await helpers.addTestStock({
+      other = await helpers.addTestStock({
         name: 'Other, Inc.',
         ticker: 'OTHR',
         exchange: 'XCNGE'
       });
-      unusedId = await helpers.addTestStock({
+      unused = await helpers.addTestStock({
         name: 'Unused, Inc.',
         ticker: 'UUUD',
         exchange: 'XCNGE'
       });
-      await helpers.addTestPick(acmeId, memberId, { ratio: 0.6 });
-      await helpers.addTestPick(otherId, memberId, { ratio: 0.4 });
+      await helpers.addTestPick(acme.id, member.id, { ratio: 0.6 });
+      await helpers.addTestPick(other.id, member.id, { ratio: 0.4 });
       const lastYear = moment().subtract(1, 'years').toDate();
-      const pickIdToDeactivate = await helpers.addTestPick(unusedId, memberId, { ratio: 1, startDate: lastYear });
-      await deactivatePick(pickIdToDeactivate);
+      const pickToDeactivate = await helpers.addTestPick(unused.id, member.id, { ratio: 1, startDate: lastYear });
+      await deactivatePick(pickToDeactivate.id);
     });
     it('should return a list of active stocks', async function () {
       const response = await chai.request(app).get('/stocks');
       expect(response.status).to.eql(200);
       expect(response.body.stocks.length).to.eql(2);
       const ids = response.body.stocks.map(stock => stock.id);
-      expect(ids).to.include(acmeId);
-      expect(ids).to.include(otherId);
+      expect(ids).to.include(acme.id);
+      expect(ids).to.include(other.id);
     });
   });
 });
