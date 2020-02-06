@@ -1,8 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const moment = require('moment');
 
-const config = require('../../config.json');
 const StockValueQueries = require('../../Queries/StockValues');
 const helpers = require('../helpers');
 chai.use(chaiAsPromised);
