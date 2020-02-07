@@ -24,6 +24,7 @@ describe('Pick Queries', function() {
         stockId: stock.id,
         memberId: member.id,
         ratio: 1,
+        position: 'long',
         startDate: new Date(),
       }).then(pick => {
         expect(pick.id).to.be.above(0);

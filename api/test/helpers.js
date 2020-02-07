@@ -7,6 +7,7 @@ const PickQueries = require('../Queries/Picks');
 const tables = require('../Queries/tables');
 const secrets = require('../secrets.json');
 const { defaultPayload } = require('../Handlers/Auth');
+const Position = require('../Models/Position');
 
 /**
  * Add a member
@@ -92,6 +93,7 @@ function addTestPick(stockId, memberId, overrides = {}) {
   const defaults = {
     startDate: new Date(),
     ratio: 1,
+    position: Position.LONG,
   };
   const params = {
     ...defaults,

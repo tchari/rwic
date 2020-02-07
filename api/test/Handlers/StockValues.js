@@ -7,6 +7,7 @@ const find = require('lodash/find');
 const config = require('../../config.json');
 const app = require('../../app');
 const helpers = require('../helpers');
+const Position = require('../../Models/Position');
 
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
@@ -91,10 +92,13 @@ describe('StockValue EndPoints', function() {
         lastName: 'Shabidoo',
         email: 'joey@joejoe.shabidoo',
       });
-      await helpers.addTestPick(tesla.id, bob.id, { startDate, ratio: 0.25 });
-      await helpers.addTestPick(apple.id, bob.id, { startDate, ratio: 0.75 });
-      await helpers.addTestPick(apple.id, joey.id, { startDate, ratio: 0.5 });
-      await helpers.addTestPick(microsoft.id, joey.id, { startDate, ratio: 0.5 });
+      await helpers.addTestPick(tesla.id, bob.id, { startDate, ratio: 0.2, position: Position.LONG });
+      await helpers.addTestPick(apple.id, bob.id, { startDate, ratio: 0.7, position: Position.LONG });
+      await helpers.addTestPick(microsoft.id, bob.id, { startDate, ratio: 0.1, position: Position.SHORT });
+      
+      await helpers.addTestPick(tesla.id, joey.id, { startDate, ratio: 0.2, position: Position.SHORT });
+      await helpers.addTestPick(apple.id, joey.id, { startDate, ratio: 0.4, position: Position.LONG });
+      await helpers.addTestPick(microsoft.id, joey.id, { startDate, ratio: 0.4, position: Position.LONG });
     });
     it('should return the leaderboard', async function() {
       const response = await chai.request(app).get('/api/leaderboard').set('Authorization', `bearer ${token}`);
@@ -105,11 +109,11 @@ describe('StockValue EndPoints', function() {
       const foundBob = find(leaderboard, { memberId: bob.id });
       expect(foundBob.firstName).to.eql('Bob');
       expect(foundBob.lastName).to.eql('Loblaw');
-      expect(foundBob.increase).to.eql(1);
+      expect(foundBob.increase).to.eql(0.95);
       const foundJoey = find(leaderboard, { memberId: joey.id });
       expect(foundJoey.firstName).to.eql('Joey');
       expect(foundJoey.lastName).to.eql('Shabidoo');
-      expect(foundJoey.increase).to.eql(0.25);
+      expect(foundJoey.increase).to.eql(0);
     });
   });
 });

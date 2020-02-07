@@ -33,6 +33,7 @@ describe('Pick EndPoints', function() {
           memberId: member.id,
           stockId: stock.id,
           startDate: moment().startOf('day').toDate(),
+          position: 'long',
           ratio: 0.12,
         });
       expect(response.status).to.eql(200);

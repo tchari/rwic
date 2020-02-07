@@ -1,5 +1,6 @@
 const yup = require('yup');
 const Entity = require('./Entity');
+const Position = require('./Position');
 
 class Pick extends Entity {
   constructor(pick) {
@@ -10,6 +11,7 @@ class Pick extends Entity {
     this.startDate = pick.startDate;
     this.active = pick.active;
     this.ratio = pick.ratio;
+    this.position = pick.position;
   }
 
   validate(pick) {
@@ -19,6 +21,7 @@ class Pick extends Entity {
       ratio: yup.number().positive().max(1).required(),
       startDate: yup.date().required(),
       active: yup.bool().strict(),
+      position: yup.mixed().oneOf(Object.values(Position)).required(),
     }).validateSync(pick);
   }
 }

@@ -53,6 +53,7 @@ async function getYearToDateLeaderboard(today) {
       'date',
       `${PICK}.id as pickId`,
       `${PICK}.memberId`,
+      `${PICK}.position`,
       `${MEMBER}.firstName`,
       `${MEMBER}.lastName`,
       `${PICK}.ratio`,

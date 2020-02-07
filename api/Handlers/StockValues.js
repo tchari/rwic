@@ -6,6 +6,7 @@ const findIndex = require('lodash/findIndex');
 
 const config = require('../config.json');
 const StockValueQueries = require('../Queries/StockValues');
+const Position = require('../Models/Position');
 
 async function getLeaderBoard(req, res) {
   try {
@@ -24,10 +25,10 @@ async function getLeaderBoard(req, res) {
       const startDate = moment(config.thisYearStartDate).toDate();
       const start = find(group, { date: startDate });
       const latest = find(group, { date: today });
-      const { ratio, value: startValue, memberId } = start;
+      const { ratio, value: startValue, memberId, position } = start;
       const latestValue = latest.value;
-      // increase = latestValue - startValue = ratio / startValue * latestValue - ratio = ratio * (latestValue / startValue - 1)
-      const increase = ratio * (latestValue / startValue - 1);
+      const positionFactor = position === Position.SHORT ? -1 : 1;
+      const increase = positionFactor * ratio * (latestValue / startValue - 1);
       const leaderboardIndex = findIndex(leaderboard, { memberId });
       leaderboard[leaderboardIndex].increase += increase;
     });
