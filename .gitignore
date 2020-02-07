@@ -1,5 +1,7 @@
-.vscode
-rwic.code-workspace
-secrets.json
-node_modules
-scratch.js
+/.vscode
+/rwic.code-workspace
+/scratch.js
+
+/api/secrets.json
+/api/node_modules
+/api/app.log
