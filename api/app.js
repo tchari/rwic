@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('./Middleware/logger');
 const memberRoutes = require('./Routes/member');
 const stockRoutes = require('./Routes/stock');
 const pickRoutes = require('./Routes/pick');
@@ -12,6 +13,7 @@ app.use(express.json());
 /**
  * Member end points
  */
+app.use(logger);
 app.use('/members', memberRoutes);
 app.use('/stocks', stockRoutes);
 app.use('/picks', pickRoutes);
