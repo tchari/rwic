@@ -8,7 +8,7 @@ function init() {
     table.increments();
     table.string('firstName').notNullable();
     table.string('lastName').notNullable();
-    table.string('email').notNullable();
+    table.string('email').unique().notNullable();
     table.timestamps(false, true);
   });
 }
@@ -19,9 +19,17 @@ async function addMember(member) {
   return new Member(added[0]);
 }
 
-async function getMember(memberId) {
-  const result = await knex(MEMBER).select().where({ id: memberId });
-  return result[0]; // should only have 1 result
+async function getMemberByEmail(email) {
+  return await getMember({ email });
+}
+
+async function getMemberById(memberId) {
+  return getMember({ id: memberId });
+}
+
+async function getMember(whereCondition) {
+  const result = await knex(MEMBER).select().where(whereCondition);
+  return result.length === 0 ? null : new Member(result[0]); // will have 1 or 0 results
 }
 
 function getAllMembers() {
@@ -31,4 +39,5 @@ function getAllMembers() {
 module.exports.init = init;
 module.exports.addMember = addMember;
 module.exports.getAllMembers = getAllMembers;
-module.exports.getMember = getMember;
+module.exports.getMemberById = getMemberById;
+module.exports.getMemberByEmail = getMemberByEmail;

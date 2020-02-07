@@ -10,6 +10,7 @@ const deactivatePick = require('../../Queries/Picks').deactivatePick;
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 const { expect } = chai;
+const token = helpers.token;
 
 describe('Stock EndPoints', function() {
   before(async function() {
@@ -21,7 +22,8 @@ describe('Stock EndPoints', function() {
   describe('Add Stock', function () {
     it('should return the stock id', async function () {
       const response = await chai.request(app)
-        .post('/stocks')
+        .post('/api/stocks')
+        .set('Authorization', `bearer ${token}`)
         .send({
           name: 'Blarg, Inc.',
           ticker: 'BLRG',
@@ -44,7 +46,7 @@ describe('Stock EndPoints', function() {
       });
     });
     it('should return the stock id', async function () {
-      const response = await chai.request(app).get(`/stocks/${stock.id}`);
+      const response = await chai.request(app).get(`/api/stocks/${stock.id}`).set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
       expect(response.body.id).to.eql(stock.id);
       expect(response.body.created_at).to.exist;
@@ -83,7 +85,7 @@ describe('Stock EndPoints', function() {
       await deactivatePick(pickToDeactivate.id);
     });
     it('should return a list of active stocks', async function () {
-      const response = await chai.request(app).get('/stocks');
+      const response = await chai.request(app).get('/api/stocks').set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
       expect(response.body.stocks.length).to.eql(2);
       const ids = response.body.stocks.map(stock => stock.id);

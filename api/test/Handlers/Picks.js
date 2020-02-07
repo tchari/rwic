@@ -9,6 +9,7 @@ const helpers = require('../helpers');
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 const { expect } = chai;
+const token = helpers.token;
 
 describe('Pick EndPoints', function() {
   before(async function() {
@@ -26,7 +27,8 @@ describe('Pick EndPoints', function() {
     });
     it('should return a pick id', async function () {
       const response = await chai.request(app)
-        .post('/picks')
+        .post('/api/picks')
+        .set('Authorization', `bearer ${token}`)
         .send({
           memberId: member.id,
           stockId: stock.id,
@@ -48,7 +50,7 @@ describe('Pick EndPoints', function() {
       pick = await helpers.addTestPick(stock.id, member.id, { ratio: 0.1, startDate: startDate.toDate() });
     });
     it('should return a pick', async function () {
-      const response = await chai.request(app).get(`/picks/${pick.id}`);
+      const response = await chai.request(app).get(`/api/picks/${pick.id}`).set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
       expect(response.body.id).to.eql(pick.id);
       expect(response.body.active).to.be.true;
@@ -69,10 +71,10 @@ describe('Pick EndPoints', function() {
       pick = await helpers.addTestPick(stock.id, member.id);
     });
     it('should return a pickId', async function () {
-      const deactivateResponse = await chai.request(app).patch(`/picks/${pick.id}/deactivate`);
+      const deactivateResponse = await chai.request(app).patch(`/api/picks/${pick.id}/deactivate`).set('Authorization', `bearer ${token}`);
       expect(deactivateResponse.status).to.eql(200);
       expect(deactivateResponse.body.id).to.eql(pick.id);
-      const pickResponse = await chai.request(app).get(`/picks/${pick.id}`);
+      const pickResponse = await chai.request(app).get(`/api/picks/${pick.id}`).set('Authorization', `bearer ${token}`);
       expect(pickResponse.body.active).to.be.false;
     });
   });
@@ -82,13 +84,13 @@ describe('Pick EndPoints', function() {
       const member = await helpers.addTestMember();
       const stock = await helpers.addTestStock();
       pick = await helpers.addTestPick(stock.id, member.id);
-      await chai.request(app).patch(`/picks/${pick.id}/deactivate`);
+      await chai.request(app).patch(`/api/picks/${pick.id}/deactivate`);
     });
     it('should return a pickId', async function () {
-      const deactivateResponse = await chai.request(app).patch(`/picks/${pick.id}/activate`);
+      const deactivateResponse = await chai.request(app).patch(`/api/picks/${pick.id}/activate`).set('Authorization', `bearer ${token}`);
       expect(deactivateResponse.status).to.eql(200);
       expect(deactivateResponse.body.id).to.eql(pick.id);
-      const pickResponse = await chai.request(app).get(`/picks/${pick.id}`);
+      const pickResponse = await chai.request(app).get(`/api/picks/${pick.id}`).set('Authorization', `bearer ${token}`);
       expect(pickResponse.body.active).to.be.true;
     });
   });

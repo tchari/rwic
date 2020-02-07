@@ -14,9 +14,8 @@ async function addMember(req, res) {
 async function getMember(req, res) {
   const { memberId } = req.params
   try {
-    const memberResult = await MemberQueries.getMember(memberId);
-    const member = new Member(memberResult);
-    res.json({ ...member });
+    const member = await MemberQueries.getMemberById(memberId);
+    res.json(member);
   } catch (e) {
     res.status(400).json({ message: `Failed to retrieve the member with id ${memberId}.`, reason: e.message });
   }

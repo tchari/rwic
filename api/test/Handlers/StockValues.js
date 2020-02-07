@@ -11,6 +11,7 @@ const helpers = require('../helpers');
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 const { expect } = chai;
+const token = helpers.token;
 
 describe('StockValue EndPoints', function() {
   before(async function() {
@@ -96,7 +97,7 @@ describe('StockValue EndPoints', function() {
       await helpers.addTestPick(microsoft.id, joey.id, { startDate, ratio: 0.5 });
     });
     it('should return the leaderboard', async function() {
-      const response = await chai.request(app).get('/leaderboard');
+      const response = await chai.request(app).get('/api/leaderboard').set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
       expect(response.body.leaderboard).to.exist;
       expect(response.body.leaderboard.length).to.eql(2);

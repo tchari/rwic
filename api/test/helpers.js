@@ -1,9 +1,12 @@
+const jwt = require('jsonwebtoken');
 const knex = require('../Queries/initConnection');
 const MemberQueries = require('../Queries/Members');
 const StockQueries = require('../Queries/Stocks');
 const StockValueQueries = require('../Queries/StockValues');
 const PickQueries = require('../Queries/Picks');
 const tables = require('../Queries/tables');
+const secrets = require('../secrets.json');
+const { defaultPayload } = require('../Handlers/Auth');
 
 /**
  * Add a member
@@ -123,9 +126,12 @@ async function initDb() {
   await StockValueQueries.init();
 }
 
+const token = jwt.sign({ ...defaultPayload, sub: 1234, scope: 'leaderboard' }, secrets.jwtSecret);
+
 module.exports.addTestMember = addTestMember;
 module.exports.addTestStock = addTestStock;
 module.exports.addTestStockValue = addTestStockValue;
 module.exports.addTestPick = addTestPick;
 module.exports.resetDb = resetDb;
 module.exports.initDb = initDb;
+module.exports.token = token;

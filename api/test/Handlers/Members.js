@@ -8,6 +8,7 @@ const helpers = require('../helpers');
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 const { expect } = chai;
+const token = helpers.token;
 
 describe('Member EndPoints', function() {
   before(async function() {
@@ -20,7 +21,8 @@ describe('Member EndPoints', function() {
     it('should return the member', async function () {
       const response = await chai
         .request(app)
-        .post('/members')
+        .post('/api/members')
+        .set('Authorization', `bearer ${token}`)
         .send({
           email: 'blah@blah.blah',
           lastName: 'Loblaw',
@@ -47,7 +49,8 @@ describe('Member EndPoints', function() {
     it('should return the member entity', async function () {
       const response = await chai
         .request(app)
-        .get(`/members/${member.id}`);
+        .get(`/api/members/${member.id}`)
+        .set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
       expect(response.body.id).to.eql(member.id);
       expect(response.body.email).to.eql('some.test@user.com');
@@ -67,7 +70,8 @@ describe('Member EndPoints', function() {
     it('should return a list of members', async function () {
       const response = await chai
         .request(app)
-        .get('/members');
+        .get('/api/members')
+        .set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
       expect(response.body.members).to.exist;
       expect(response.body.members.length).to.eql(4);
