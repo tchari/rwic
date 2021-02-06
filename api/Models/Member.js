@@ -1,7 +1,15 @@
 const yup = require('yup');
 const Entity = require('./Entity');
 
+/**
+ * A member entity
+ */
 class Member extends Entity {
+  /**
+   * Construct a member
+   *
+   * @param {object} member 
+   */
   constructor(member) {
     super(member);
     this.validate(member);
@@ -10,6 +18,11 @@ class Member extends Entity {
     this.email = member.email;
   }
 
+  /**
+   * Validate member entity
+   *
+   * @param {object} member 
+   */
   validate(member) {
     yup.object().shape({
       firstName: yup.string().strict().required(),

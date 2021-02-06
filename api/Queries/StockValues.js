@@ -6,6 +6,10 @@ const StockValue = require('../Models/StockValue');
 
 const { STOCK_VALUE, STOCK, PICK, MEMBER } = tables;
 
+/**
+ * Some todos
+ * 1. StockId-date combination should be unique
+ */
 function init() {
   return knex.schema.createTable(STOCK_VALUE, function (table) {
     table.increments();

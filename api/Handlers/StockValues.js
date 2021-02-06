@@ -3,10 +3,12 @@ const groupBy = require('lodash/groupBy');
 const forEach = require('lodash/forEach');
 const find = require('lodash/find');
 const findIndex = require('lodash/findIndex');
+const sortBy = require('lodash/sortBy');
 
 const config = require('../config.json');
 const StockValueQueries = require('../Queries/StockValues');
 const Position = require('../Models/Position');
+const { orderBy } = require('lodash');
 
 async function getLeaderBoard(req, res) {
   try {
@@ -16,7 +18,7 @@ async function getLeaderBoard(req, res) {
     leaderboardResult.forEach(({ memberId, firstName, lastName }) => {
       const member = find(leaderboard, { memberId });
       if (!member) {
-        leaderboard.push({ memberId, firstName, lastName, increase: 0 });
+        leaderboard.push({ memberId, firstName, lastName, closingValue: 0 });
       }
     });
 
@@ -27,12 +29,15 @@ async function getLeaderBoard(req, res) {
       const latest = find(group, { date: today });
       const { ratio, value: startValue, memberId, position } = start;
       const latestValue = latest.value;
-      const positionFactor = position === Position.SHORT ? -1 : 1;
-      const increase = positionFactor * ratio * (latestValue / startValue - 1);
+      const initialInvestment = 1000 * ratio;
+      const boughtShares = initialInvestment / startValue;
+      const currentInvestmentValue = boughtShares * latestValue;
       const leaderboardIndex = findIndex(leaderboard, { memberId });
-      leaderboard[leaderboardIndex].increase += increase;
+      const additionalClosingValue = position === Position.LONG ? currentInvestmentValue : (2 * initialInvestment - currentInvestmentValue);
+      leaderboard[leaderboardIndex].closingValue += additionalClosingValue;
     });
-    res.json({ leaderboard });
+    const ordered = orderBy(leaderboard, ['closingValue'], ['desc']);
+    res.json({ leaderboard: ordered });
   } catch (e) {
     res.status(400).json({ message: `Failed to retrieve the leaderboard.`, reason: e.message });
   }

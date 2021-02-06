@@ -3,6 +3,10 @@ const tables = require('./tables');
 const Member = require('../Models/Member');
 
 const { MEMBER } = tables;
+/**
+ * Some todos
+ * 1. Email should be unique; can't add the same member twice
+ */
 function init() {
   return knex.schema.createTable(MEMBER, function (table) {
     table.increments();

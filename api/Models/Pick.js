@@ -3,6 +3,11 @@ const Entity = require('./Entity');
 const Position = require('./Position');
 
 class Pick extends Entity {
+  /**
+   * Construct a pick
+   *
+   * @param {object} pick 
+   */
   constructor(pick) {
     super(pick);
     this.validate(pick);
@@ -10,10 +15,15 @@ class Pick extends Entity {
     this.stockId = pick.stockId;
     this.startDate = pick.startDate;
     this.active = pick.active;
-    this.ratio = pick.ratio;
+    this.ratio = pick.ratio; // ratio of the entire portfolio
     this.position = pick.position;
   }
 
+  /**
+   * Validate a pick
+   *
+   * @param {object} pick 
+   */
   validate(pick) {
     yup.object().shape({
       memberId: yup.number().integer().positive().required(),

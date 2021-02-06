@@ -2,6 +2,11 @@ const yup = require('yup');
 const Entity = require('./Entity');
 
 class Stock extends Entity {
+  /**
+   * Construct a stock
+   *
+   * @param {object} stock 
+   */
   constructor(stock) {
     super(stock);
     this.validate(stock);
@@ -10,6 +15,11 @@ class Stock extends Entity {
     this.exchange = stock.exchange;
   }
 
+  /**
+   * Validate a stock
+   *
+   * @param {object} stock
+   */
   validate(stock) {
     yup.object().shape({
       name: yup.string().required(),

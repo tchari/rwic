@@ -1,7 +1,16 @@
 const yup = require('yup');
 const Entity = require('./Entity');
 
+/**
+ * Value of a stock over time
+ */
 class StockValue extends Entity {
+
+  /**
+   * Construct a stock value
+   *
+   * @param {object} stockValue 
+   */
   constructor(stockValue) {
     super(stockValue);
     this.validate(stockValue);
@@ -10,6 +19,11 @@ class StockValue extends Entity {
     this.date = stockValue.date;
   }
 
+  /**
+   * Validate a stock value
+   *
+   * @param {object} stockValue 
+   */
   validate(stockValue) {
     yup.object().shape({
       stockId: yup.number().integer().positive().required(),

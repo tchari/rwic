@@ -4,6 +4,10 @@ const Stock = require('../Models/Stock');
 
 const { STOCK, PICK } = tables;
 
+/**
+ * Some todos
+ * 1. Ticker should be unique; can't add the same stock ticker twice
+ */
 function init() {
   return knex.schema.createTable(STOCK, function (table) {
     table.increments();

@@ -21,6 +21,7 @@ app.use('/api', auth);
 app.use('/api/members', memberRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/picks', pickRoutes);
+
 /**
  * Stock Value end points
  */

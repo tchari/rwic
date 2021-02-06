@@ -4,6 +4,11 @@ const Pick = require('../Models/Pick');
 
 const { PICK, MEMBER, STOCK } = tables;
 
+/**
+ * Some todos
+ * 1. Member-stock-active combination should be unique; the same user cannot pick the same stock twice in a year
+ * 2. Should be able to add pick by member email (or name?) and stock ticker instead of ids
+ */
 function init() {
   return knex.schema.createTable(PICK, function (table) {
     table.increments();

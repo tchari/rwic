@@ -4,7 +4,8 @@ const MemberQueries = require('../Queries/Members');
 const secrets = require('../secrets.json');
 
 // 1 hour expiry
-const defaultPayload = { exp: moment().unix() + 60 * 60 * 1, iss: 'rwic', aud: 'rwic' };
+const getDefaultExpiry = () => moment().unix() + 60 * 60 * 1;
+const defaultPayload = { exp: getDefaultExpiry(), iss: 'rwic', aud: 'rwic' };
 
 async function doAuth(req, res) {
   const { email } = req.body;
