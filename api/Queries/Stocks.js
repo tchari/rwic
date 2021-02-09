@@ -4,16 +4,12 @@ const Stock = require('../Models/Stock');
 
 const { STOCK, PICK } = tables;
 
-/**
- * Some todos
- * 1. Ticker should be unique; can't add the same stock ticker twice
- */
 function init() {
   return knex.schema.createTable(STOCK, function (table) {
     table.increments();
     table.string('name').notNullable();
-    table.string('ticker').notNullable();
-    table.string('exchange').notNullable();
+    table.string('ticker').unique().notNullable();
+    table.string('mic').notNullable();
     table.timestamps(false, true);
   });
 }
@@ -37,7 +33,12 @@ async function getActiveStocks() {
     .groupBy(`${STOCK}.id`);
 }
 
+async function getStocks(queryParams) {
+  return await knex(STOCK).where(queryParams);
+}
+
 module.exports.init = init;
 module.exports.addStock = addStock;
 module.exports.getStock = getStock;
+module.exports.getStocks = getStocks;
 module.exports.getActiveStocks = getActiveStocks;

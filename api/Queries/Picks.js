@@ -1,14 +1,11 @@
 const knex = require('./initConnection');
 const tables = require('./tables');
 const Pick = require('../Models/Pick');
+const Stock = require('../Models/Stock');
+const Member = require('../Models/Member');
 
 const { PICK, MEMBER, STOCK } = tables;
 
-/**
- * Some todos
- * 1. Member-stock-active combination should be unique; the same user cannot pick the same stock twice in a year
- * 2. Should be able to add pick by member email (or name?) and stock ticker instead of ids
- */
 function init() {
   return knex.schema.createTable(PICK, function (table) {
     table.increments();
@@ -20,6 +17,7 @@ function init() {
     table.date('startDate').notNullable();
     table.boolean('active').notNullable().defaultTo(true);
     table.string('position').notNullable();
+    table.string('pickCode').unique().notNullable(); // unique identifier for picks
     table.timestamps(false, true);
   });
 }
@@ -30,7 +28,9 @@ function init() {
  * @param {object} pick 
  */
 async function addPick(pick) {
-  await knex(PICK).insert({ ...pick });
+  const insertablePick = await makeInsertablePick(pick);
+  const pickCode = makePickCode(pick);
+  await knex(PICK).insert({ ...insertablePick, pickCode });
   const result = await knex(PICK).select().whereRaw('id = last_insert_id()');
   const newPick = result[0];
   return new Pick({ ...newPick, active: newPick.active ? true : false});
@@ -52,6 +52,32 @@ async function deactivatePick(pickId) {
 
 async function activatePick(pickId) {
   await knex(PICK).update({ active: true }).where({ id: pickId });
+}
+
+function makePickCode(pick) {
+  return `${pick.memberId}-${pick.stockId}-${pick.active}`;
+}
+
+/**
+ * Allows us to add a pick by ticker and/or by email instead of tickerId or memberId
+ * 
+ * @param {object} pick
+ */
+async function makeInsertablePick(pick) {
+  if (pick.ticker) {
+    const result = await knex(STOCK).select().where('ticker', '=', pick.ticker);
+    const stock = new Stock(result);
+    pick.stockId = stock.id;
+  }
+  if (pick.email) {
+    const result = await knex(MEMBER).select().where('email', '=', pick.email);
+    const member = new Member(result);
+    pick.memberId = member.id;
+  }
+  if (!('active' in pick)) {
+    pick.active = true;
+  }
+  return pick;
 }
 
 module.exports.init = init;

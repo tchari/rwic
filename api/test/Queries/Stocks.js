@@ -17,14 +17,14 @@ describe('Stock Queries', function() {
       StockQueries.addStock({
         name: 'Tesla, Inc.',
         ticker: 'TSLA',
-        exchange: 'NASDAQ',
+        mic: 'XNAS',
       }).then(stock => {
         expect(stock.id).to.be.above(0);
         expect(stock.created_at).to.exist;
         expect(stock.updated_at).to.exist;
         expect(stock.name).to.eql('Tesla, Inc.');
         expect(stock.ticker).to.eql('TSLA');
-        expect(stock.exchange).to.eql('NASDAQ');
+        expect(stock.mic).to.eql('XNAS');
         done();
       }).catch(e => {
         done(e);

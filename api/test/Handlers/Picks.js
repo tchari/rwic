@@ -13,7 +13,7 @@ const token = helpers.token;
 
 describe('Pick EndPoints', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();

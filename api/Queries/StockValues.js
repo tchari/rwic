@@ -17,17 +17,20 @@ function init() {
     table.foreign('stockId').references(`${STOCK}.id`); // foreign key to stock.id
     table.decimal('value', 8, 2).notNullable(); // supports up to 999,999.99
     table.date('date').notNullable();
+    table.string('stockValueCode').unique().notNullable(); // unique identifier for a stock value - prevents duplicate values
   });
 }
 
 async function addStockValue(stockValue) {
-  await knex(STOCK_VALUE).insert(stockValue);
+  const stockValueCode = makeStockValueCode(stockValue);
+  await knex(STOCK_VALUE).insert({ ...stockValue, stockValueCode });
   const added = await knex(STOCK_VALUE).select().whereRaw('id = last_insert_id()');
   return new StockValue(added[0]);
 }
 
 async function addStockValues(stockValues) {
-  const result = await knex(STOCK_VALUE).insert(stockValues);
+  const valuesToAdd = stockValues.map(v => ({ ...v, stockValueCode: makeStockValueCode(v) }));
+  const result = await knex(STOCK_VALUE).insert(valuesToAdd);
   const firstId = result[0];
   const added = await knex(STOCK_VALUE).select().whereRaw('id >= ? and id < ?', [firstId, firstId + stockValues.length]);
   return added.map(sv => new StockValue(sv));
@@ -65,7 +68,36 @@ async function getYearToDateLeaderboard(today) {
   return results;
 }
 
+/**
+ * Get the values for all the stocks on a specified day
+ *
+ * @param {array} stocks 
+ * @param {Date} date 
+ */
+async function getStockValuesOnDay(stocks, date) {
+  const stockIds = stocks.map(s => s.id);
+  return await knex(STOCK_VALUE)
+    .where({ [`${STOCK_VALUE}.date`]: date.toDate() })
+    .whereIn('stockId', stockIds)
+}
+
+/**
+ * Get the values for stocks on the start date of the annual meeting
+ *
+ * @param {array} stocks 
+ */
+async function getInitialStockValues(stocks) {
+  const startDate = moment(config.thisYearStartDate);
+  return getStockValuesOnDay(stocks, startDate);
+}
+
+function makeStockValueCode(stockValue) {
+  return `${stockValue.stockId}-${stockValue.date}`
+}
+
 module.exports.init = init;
 module.exports.addStockValue = addStockValue;
 module.exports.addStockValues = addStockValues;
 module.exports.getYearToDateLeaderboard = getYearToDateLeaderboard;
+module.exports.getStockValuesOnDay = getStockValuesOnDay;
+module.exports.getInitialStockValues = getInitialStockValues;

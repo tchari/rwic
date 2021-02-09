@@ -16,7 +16,7 @@ const token = helpers.token;
 
 describe('StockValue EndPoints', function() {
   before(async function() {
-    await helpers.initDb();
+    await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();
@@ -34,7 +34,7 @@ describe('StockValue EndPoints', function() {
       tesla = await helpers.addTestStock({
         name: 'Tesla, Inc.',
         ticker: 'TSLA',
-        exchange: 'NASDAQ',
+        mic: 'XNAS',
       });
       await helpers.addTestStockValue(tesla.id, {
         value: 1,
@@ -51,7 +51,7 @@ describe('StockValue EndPoints', function() {
       apple = await helpers.addTestStock({
         name: 'Apple, Inc.',
         ticker: 'AAPL',
-        exchange: 'NASDAQ',
+        mic: 'XNAS',
       });
       await helpers.addTestStockValue(apple.id, {
         value: 10,
@@ -68,7 +68,7 @@ describe('StockValue EndPoints', function() {
       microsoft = await helpers.addTestStock({
         name: 'Microsoft Corporation',
         ticker: 'MFST',
-        exchange: 'NASDAQ',
+        mic: 'XNAS',
       });
       await helpers.addTestStockValue(microsoft.id, {
         value: 200,
@@ -109,11 +109,11 @@ describe('StockValue EndPoints', function() {
       const foundBob = find(leaderboard, { memberId: bob.id });
       expect(foundBob.firstName).to.eql('Bob');
       expect(foundBob.lastName).to.eql('Loblaw');
-      expect(foundBob.increase).to.eql(0.95);
+      expect(foundBob.closingValue).to.eql(1950);
       const foundJoey = find(leaderboard, { memberId: joey.id });
       expect(foundJoey.firstName).to.eql('Joey');
       expect(foundJoey.lastName).to.eql('Shabidoo');
-      expect(foundJoey.increase).to.eql(0);
+      expect(foundJoey.closingValue).to.eql(1000);
     });
   });
 });

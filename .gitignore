@@ -1,6 +1,8 @@
 /.vscode
 /rwic.code-workspace
 /scratch
+/dumps
+/Picks
 
 /api/secrets.json
 /api/node_modules

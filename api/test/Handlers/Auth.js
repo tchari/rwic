@@ -11,7 +11,7 @@ const { expect } = chai;
 
 describe('Auth EndPoints', function() {
   before(async function() {
-    await helpers.resetDb();
+    // await helpers.resetDb();
   });
   afterEach(async function() {
     await helpers.resetDb();

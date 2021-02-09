@@ -1,8 +1,9 @@
 {
   "thisYearStartDate": "2020-01-24",
   "stockApi": {
-    "scheme": "https",
-    "domain": "api.worldtradingdata.com",
-    "path": "/api/v1/history_multi_single_day"
+    "scheme": "http",
+    "domain": "api.marketstack.com",
+    "basePath": "v1",
+    "allowedMICs": ["XASE", "XASX", "XLIM", "BVMF", "XBAH", "XBEL", "XBOG", "BMEX", "XBOM", "XMIL", "XBUE", "XSTU", "XCNQ", "XCSE", "XFRA", "XETRA", "XDFM", "XCAI", "XAMS", "XBRU", "XLIS", "XPAR", "XFKA", "XHEL", "XSTC", "XHKG", "IEXG", "XIST", "XIDX", "XJSE", "XKRX", "XLON", "XKLS", "XMEX", "MISX", "XNAS", "ARCX", "XNGO", "XICE", "XRIS", "XLIT", "XNSE", "XNYS", "XNZE", "XNSA", "OOTC", "PSGM", "OTCM", "PINC", "OTCB", "OTCQ", "XOSL", "DSMD", "XSWX", "XSGO", "XSAP", "XSAU", "XSHG", "XSHE", "XSES", "XBKK", "XSTO", "XTSX", "XTAI", "XTAL", "XTAE", "XTKS", "XTSE", "NMFQS", "XWAR"]
   }
 }

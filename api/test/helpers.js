@@ -9,6 +9,10 @@ const secrets = require('../secrets.json');
 const { defaultPayload } = require('../Handlers/Auth');
 const Position = require('../Models/Position');
 
+function random() {
+  return Math.random().toString(36).substring(7);
+}
+
 /**
  * Add a member
  *
@@ -23,7 +27,7 @@ function addTestMember(overrides = {}) {
   const defaults = {
     firstName: 'testFirstName',
     lastName: 'testLastName',
-    email: 'some@email.com',
+    email: `some@random${random()}random.com`,
   };
   const params = {
     ...defaults,
@@ -38,7 +42,7 @@ function addTestMember(overrides = {}) {
  * @param {Object} overrides overrides object
  * @param {string} overrides.name stock name
  * @param {string} overrides.ticker stock ticker symbol
- * @param {string} overrides.exchange stock's exchange
+ * @param {string} overrides.mic stock's exchange MIC
  * 
  * @return {Promise} promise that should resolve with the added stock
  */
@@ -46,7 +50,7 @@ function addTestStock(overrides = {}) {
   const defaults = {
     name: 'Tesla, Inc.',
     ticker: 'TSLA',
-    exchange: 'NASDAQ',
+    mic: 'XNAS',
   };
   const params = {
     ...defaults,
@@ -118,14 +122,33 @@ async function resetDb() {
  * Drop all tables and re-initialize (used when the schema changes)
  */
 async function initDb() {
-  await knex.schema.dropTableIfExists(tables.PICK);
-  await knex.schema.dropTableIfExists(tables.STOCK_VALUE);
-  await knex.schema.dropTableIfExists(tables.MEMBER);
-  await knex.schema.dropTableIfExists(tables.STOCK);
-  await MemberQueries.init();
-  await StockQueries.init();
-  await PickQueries.init();
-  await StockValueQueries.init();
+  try {
+    console.log('dropping pick');
+    await knex.schema.dropTableIfExists(tables.PICK);
+    console.log('dropping stock value');
+    await knex.schema.dropTableIfExists(tables.STOCK_VALUE);
+    console.log('dropping member');
+    await knex.schema.dropTableIfExists(tables.MEMBER);
+    console.log('dropping stock');
+    await knex.schema.dropTableIfExists(tables.STOCK);
+
+    console.log('initing member');
+    await MemberQueries.init();
+    console.log('initing stock');
+    await StockQueries.init();
+    console.log('initing picks');
+    try {
+      await PickQueries.init();
+    } catch (e) {
+      console.log(e);
+    }
+    console.log('initing stockvalues');
+    await StockValueQueries.init();
+  } catch (e) {
+    console.log(e);
+  } finally {
+    knex.destroy();
+  }
 }
 
 const token = jwt.sign({ ...defaultPayload, sub: 1234, scope: 'leaderboard' }, secrets.jwtSecret);
@@ -134,6 +157,7 @@ module.exports.addTestMember = addTestMember;
 module.exports.addTestStock = addTestStock;
 module.exports.addTestStockValue = addTestStockValue;
 module.exports.addTestPick = addTestPick;
+module.exports.random = random;
 module.exports.resetDb = resetDb;
 module.exports.initDb = initDb;
 module.exports.token = token;

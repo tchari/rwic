@@ -27,13 +27,13 @@ describe('Stock EndPoints', function() {
         .send({
           name: 'Blarg, Inc.',
           ticker: 'BLRG',
-          exchange: 'BLARGITYBLARG',
+          mic: 'XNAS',
         });
       expect(response.status).to.eql(200);
       expect(response.body.id).to.exist;
       expect(response.body.name).to.eql('Blarg, Inc.');
       expect(response.body.ticker).to.eql('BLRG');
-      expect(response.body.exchange).to.eql('BLARGITYBLARG');
+      expect(response.body.mic).to.eql('XNAS');
     });
   });
   describe('Get a stock', function () {
@@ -42,7 +42,7 @@ describe('Stock EndPoints', function() {
       stock = await helpers.addTestStock({
         name: 'Acme, Inc.',
         ticker: 'ACME',
-        exchange: 'XCNGE'
+        mic: 'XNAS'
       });
     });
     it('should return the stock id', async function () {
@@ -53,7 +53,7 @@ describe('Stock EndPoints', function() {
       expect(response.body.updated_at).to.exist;
       expect(response.body.name).to.eql('Acme, Inc.');
       expect(response.body.ticker).to.eql('ACME');
-      expect(response.body.exchange).to.eql('XCNGE');
+      expect(response.body.mic).to.eql('XNAS');
     });
   });
   describe('Get active stocks', function () {
@@ -66,17 +66,17 @@ describe('Stock EndPoints', function() {
       acme = await helpers.addTestStock({
         name: 'Acme, Inc.',
         ticker: 'ACME',
-        exchange: 'XCNGE'
+        mic: 'XNAS'
       });
       other = await helpers.addTestStock({
         name: 'Other, Inc.',
         ticker: 'OTHR',
-        exchange: 'XCNGE'
+        mic: 'XNAS'
       });
       unused = await helpers.addTestStock({
         name: 'Unused, Inc.',
         ticker: 'UUUD',
-        exchange: 'XCNGE'
+        mic: 'XNAS'
       });
       await helpers.addTestPick(acme.id, member.id, { ratio: 0.6 });
       await helpers.addTestPick(other.id, member.id, { ratio: 0.4 });
@@ -85,10 +85,10 @@ describe('Stock EndPoints', function() {
       await deactivatePick(pickToDeactivate.id);
     });
     it('should return a list of active stocks', async function () {
-      const response = await chai.request(app).get('/api/stocks').set('Authorization', `bearer ${token}`);
+      const response = await chai.request(app).get('/api/stocks/active').set('Authorization', `bearer ${token}`);
       expect(response.status).to.eql(200);
-      expect(response.body.stocks.length).to.eql(2);
-      const ids = response.body.stocks.map(stock => stock.id);
+      expect(response.body.length).to.eql(2);
+      const ids = response.body.map(stock => stock.id);
       expect(ids).to.include(acme.id);
       expect(ids).to.include(other.id);
     });

@@ -1,5 +1,6 @@
 const yup = require('yup');
 const Entity = require('./Entity');
+const config = require('../config.json');
 
 class Stock extends Entity {
   /**
@@ -12,7 +13,7 @@ class Stock extends Entity {
     this.validate(stock);
     this.name = stock.name;
     this.ticker = stock.ticker;
-    this.exchange = stock.exchange;
+    this.mic = stock.mic;
   }
 
   /**
@@ -24,7 +25,7 @@ class Stock extends Entity {
     yup.object().shape({
       name: yup.string().required(),
       ticker: yup.string().required(),
-      exchange: yup.string().required(),
+      mic: yup.mixed().oneOf(config.stockApi.allowedMICs)
     }).validateSync(stock);
   }
 }

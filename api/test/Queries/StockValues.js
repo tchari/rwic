@@ -42,7 +42,7 @@ describe('StockValue Queries', function() {
     before(async function () {
       stockA = await helpers.addTestStock({ name: 'StockA', ticker: 'SA' });
       stockB = await helpers.addTestStock({ name: 'StockB', ticker: 'SB' });
-      stockC = await helpers.addTestStock({ name: 'StockC', ticker: 'SB' });
+      stockC = await helpers.addTestStock({ name: 'StockC', ticker: 'SC' });
     });
     it('should return the stockValueId', function(done) {
       StockValueQueries.addStockValues([

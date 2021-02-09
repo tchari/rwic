@@ -3,12 +3,11 @@ const groupBy = require('lodash/groupBy');
 const forEach = require('lodash/forEach');
 const find = require('lodash/find');
 const findIndex = require('lodash/findIndex');
-const sortBy = require('lodash/sortBy');
+const orderBy = require('lodash/orderBy');
 
 const config = require('../config.json');
 const StockValueQueries = require('../Queries/StockValues');
 const Position = require('../Models/Position');
-const { orderBy } = require('lodash');
 
 async function getLeaderBoard(req, res) {
   try {
