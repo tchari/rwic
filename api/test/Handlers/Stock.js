@@ -28,6 +28,7 @@ describe('Stock EndPoints', function() {
           name: 'Blarg, Inc.',
           ticker: 'BLRG',
           mic: 'XNAS',
+          exchange: 'NASDAQ'
         });
       expect(response.status).to.eql(200);
       expect(response.body.id).to.exist;
@@ -46,11 +47,13 @@ describe('Stock EndPoints', function() {
             name: 'Blarg, Inc.',
             ticker: 'BLRG',
             mic: 'XNAS',
+            exchange: 'NASDAQ'
           },
           {
             name: 'Nambla, Inc.',
             ticker: 'AAMB',
             mic: 'XNAS',
+            exchange: 'NASDAQ'
           }
         ]);
       expect(response.status).to.eql(200);

@@ -18,6 +18,7 @@ describe('Stock Queries', function() {
         name: 'Tesla, Inc.',
         ticker: 'TSLA',
         mic: 'XNAS',
+        exchange: 'NASDAQ'
       }).then(stock => {
         expect(stock.id).to.be.above(0);
         expect(stock.created_at).to.exist;

@@ -51,6 +51,7 @@ function addTestStock(overrides = {}) {
     name: 'Tesla, Inc.',
     ticker: 'TSLA',
     mic: 'XNAS',
+    exchange: 'NASDAQ'
   };
   const params = {
     ...defaults,

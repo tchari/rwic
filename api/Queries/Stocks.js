@@ -10,6 +10,7 @@ function init() {
     table.string('name').notNullable();
     table.string('ticker').unique().notNullable();
     table.string('mic').notNullable();
+    table.string('exchange').notNullable();
     table.timestamps(false, true);
   });
 }

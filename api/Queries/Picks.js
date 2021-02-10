@@ -3,6 +3,7 @@ const tables = require('./tables');
 const Pick = require('../Models/Pick');
 const Stock = require('../Models/Stock');
 const Member = require('../Models/Member');
+const { isEmpty } = require('lodash');
 
 const { PICK, MEMBER, STOCK } = tables;
 
@@ -66,7 +67,8 @@ async function activatePick(pickId) {
 }
 
 function makePickCode(pick) {
-  return `${pick.memberId}-${pick.stockId}-${pick.active}`;
+  const sd = `${pick.startDate.getFullYear()}-${pick.startDate.getMonth() + 1}-${pick.startDate.getDate()}`;
+  return `${pick.memberId}-${pick.stockId}-${sd}`;
 }
 
 /**
@@ -78,18 +80,24 @@ async function makeInsertablePick(pick) {
   const newPick = { ...pick };
   if (pick.ticker) {
     const result = await knex(STOCK).select().where('ticker', '=', pick.ticker);
+    if (isEmpty(result)) {
+      throw new Error(`No stock with ticker ${pick.ticker} was found`);
+    }
     const stock = new Stock(result[0]);
     newPick.stockId = stock.id;
     delete newPick.ticker;
   }
   if (pick.email) {
     const result = await knex(MEMBER).select().where('email', '=', pick.email);
+    if (isEmpty(result)) {
+      throw new Error(`No memeber with email ${pick.email} was found`);
+    }
     const member = new Member(result[0]);
     newPick.memberId = member.id;
     delete newPick.email;
   }
   if (!('active' in pick)) {
-    newPick.active = true;
+    newPick.active = 1;
   }
   return newPick;
 }
