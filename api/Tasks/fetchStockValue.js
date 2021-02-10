@@ -1,6 +1,9 @@
 const axios = require('axios');
 const qs = require('query-string');
 const find = require('lodash/find');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 
 const StockQueries = require('../Queries/Stocks');
 const StockValueQueries = require('../Queries/StockValues');
@@ -28,13 +31,12 @@ async function fetchStockValues() {
   const rawActiveStocks = await StockQueries.getActiveStocks();
   const tickers = rawActiveStocks.filter(stock => allowedMICs.includes(stock.mic)).map(stock => stock.ticker);
   const queryString = qs.stringify({ symbols: tickers, access_key: apiKey }, { arrayFormat: 'comma' });
-  const url = `${baseUrl}/eod/latest?${queryString}`;
-  console.log(url);
+  const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
+  const url = `${baseUrl}/eod/${yesterday}?${queryString}`;
   const response = await axios.get(url);
-  const stockValues = response.data.data.map(datum => {
-    const { date, close: value } = datum;
-    const stock = find(rawActiveStocks, { ticker: datum.symbol });
-    return new StockValue({ date: new Date(date), value, stockId: stock.id });
+  const stockValues = response.data.data.map(({ date, close: value, symbol: ticker }) => {
+    const stock = find(rawActiveStocks, { ticker });
+    return new StockValue({ date: dayjs(date).utc().format('YYYY-MM-DD'), value, stockId: stock.id });
   });
   await StockValueQueries.addStockValues(stockValues);
 }

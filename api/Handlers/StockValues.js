@@ -62,7 +62,6 @@ async function getLeaderBoard(req, res) {
         leaderboard.push({ memberId, firstName, lastName, closingValue: 0 });
       }
     });
-    console.log(JSON.stringify(leaderboardResult));
 
     const pickGroups = groupBy(leaderboardResult, 'pickId');
     forEach(pickGroups, group => {
