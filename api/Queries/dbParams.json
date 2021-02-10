@@ -3,6 +3,6 @@
   "version": "5.7",
   "connection": {
     "host": "localhost",
-    "database": "rwic"
+    "database": "rwic_dev"
   }
 }

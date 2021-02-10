@@ -32,7 +32,7 @@ async function fetchStockValues() {
   const stockValues = response.data.data.map(datum => {
     const { date, close: value } = datum;
     const stock = find(rawActiveStocks, { ticker: datum.symbol });
-    return new StockValue({ date, value, stockId: stock.id });
+    return new StockValue({ date: new Date(date), value, stockId: stock.id });
   });
   await StockValueQueries.addStockValues(stockValues);
 }

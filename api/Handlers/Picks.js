@@ -2,6 +2,7 @@ const Pick = require('../Models/Pick');
 const PickQueries = require('../Queries/Picks');
 
 async function addPick(req, res) {
+  // @todo validate req.body
   if (Array.isArray(req.body)) {
     await addPicks(req, res);
   } else {
