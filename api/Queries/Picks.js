@@ -29,11 +29,22 @@ function init() {
  */
 async function addPick(pick) {
   const insertablePick = await makeInsertablePick(pick);
-  const pickCode = makePickCode(pick);
-  await knex(PICK).insert({ ...insertablePick, pickCode });
+  await knex(PICK).insert({ ...insertablePick, pickCode: makePickCode(insertablePick) });
   const result = await knex(PICK).select().whereRaw('id = last_insert_id()');
   const newPick = result[0];
   return new Pick({ ...newPick, active: newPick.active ? true : false});
+}
+
+async function addPicks(picks) {
+  const insertablePicks = [];
+  for (const pick of picks) {
+    const iPick = await makeInsertablePick(pick);
+    insertablePicks.push({ ...iPick, pickCode: makePickCode(iPick) });
+  }
+  const result = await knex(PICK).insert(insertablePicks);
+  const firstId = result[0];
+  const added = await knex(PICK).select().whereRaw('id >= ? and id < ?', [firstId, firstId + picks.length]);
+  return added.map(p => new Pick({ ...p, active: !!p.active }));
 }
 
 /**
@@ -64,24 +75,28 @@ function makePickCode(pick) {
  * @param {object} pick
  */
 async function makeInsertablePick(pick) {
+  const newPick = { ...pick };
   if (pick.ticker) {
     const result = await knex(STOCK).select().where('ticker', '=', pick.ticker);
-    const stock = new Stock(result);
-    pick.stockId = stock.id;
+    const stock = new Stock(result[0]);
+    newPick.stockId = stock.id;
+    delete newPick.ticker;
   }
   if (pick.email) {
     const result = await knex(MEMBER).select().where('email', '=', pick.email);
-    const member = new Member(result);
-    pick.memberId = member.id;
+    const member = new Member(result[0]);
+    newPick.memberId = member.id;
+    delete newPick.email;
   }
   if (!('active' in pick)) {
-    pick.active = true;
+    newPick.active = true;
   }
-  return pick;
+  return newPick;
 }
 
 module.exports.init = init;
 module.exports.addPick = addPick;
+module.exports.addPicks = addPicks;
 module.exports.getPick = getPick;
 module.exports.deactivatePick = deactivatePick;
 module.exports.activatePick = activatePick;

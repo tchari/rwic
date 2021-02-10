@@ -9,12 +9,12 @@ const config = require('../config.json');
 const StockValue = require('../Models/StockValue');
 
 const { apiKey } = secrets.stockApi;
-const { scheme, domain, basePath } = config.stockApi;
+const { scheme, domain, basePath, allowedMICs } = config.stockApi;
 
 const baseUrl = `${scheme}://${domain}/${basePath}`; // e.g. https://api.marketstack.com/v1
 
 /**
- * Fetch yesterday's stock values
+ * Fetches the most recent closing stock value from marketstack
  * The marketstack has an end-of-day point point that allows up to 100 tickers
  * 
  * The process goes as follows:
@@ -26,7 +26,7 @@ const baseUrl = `${scheme}://${domain}/${basePath}`; // e.g. https://api.markets
  */
 async function fetchStockValues() {
   const rawActiveStocks = await StockQueries.getActiveStocks();
-  const tickers = rawActiveStocks.map(stock => stock.ticker);
+  const tickers = rawActiveStocks.filter(stock => allowedMICs.includes(stock.mic)).map(stock => stock.ticker);
   const queryString = qs.stringify({ symbols: tickers, access_key: apiKey }, { arrayFormat: 'comma' });
   const response = await axios.get(`${baseUrl}/eod/latest?${queryString}`);
   const stockValues = response.data.data.map(datum => {

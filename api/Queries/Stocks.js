@@ -20,6 +20,13 @@ async function addStock(stock) {
   return new Stock(added[0]);
 }
 
+async function addStocks(stocks) {
+  const result = await knex(STOCK).insert(stocks);
+  const firstId = result[0];
+  const added = await knex(STOCK).select().whereRaw('id >= ? and id < ?', [firstId, firstId + stocks.length]);
+  return added.map(s => new Stock(s));
+}
+
 async function getStock(stockId) {
   const result = await knex(STOCK).select().where({ id: stockId });
   return result[0]; // should only have 1 result
@@ -39,6 +46,7 @@ async function getStocks(queryParams) {
 
 module.exports.init = init;
 module.exports.addStock = addStock;
+module.exports.addStocks = addStocks;
 module.exports.getStock = getStock;
 module.exports.getStocks = getStocks;
 module.exports.getActiveStocks = getActiveStocks;

@@ -36,6 +36,27 @@ describe('Stock EndPoints', function() {
       expect(response.body.mic).to.eql('XNAS');
     });
   });
+  describe('Add Many Stocks', function () {
+    it('should add two stocks', async function () {
+      const response = await chai.request(app)
+        .post('/api/stocks')
+        .set('Authorization', `bearer ${token}`)
+        .send([
+          {
+            name: 'Blarg, Inc.',
+            ticker: 'BLRG',
+            mic: 'XNAS',
+          },
+          {
+            name: 'Nambla, Inc.',
+            ticker: 'AAMB',
+            mic: 'XNAS',
+          }
+        ]);
+      expect(response.status).to.eql(200);
+      expect(response.body.length).to.eql(2);
+    });
+  });
   describe('Get a stock', function () {
     let stock;
     before(async function () {

@@ -1,4 +1,4 @@
-const { find, orderBy } = require('lodash');
+const { find, orderBy, isEmpty } = require('lodash');
 const moment = require('moment');
 const Stock = require('../Models/Stock');
 const StockValue = require('../Models/StockValue');
@@ -6,12 +6,52 @@ const StockQueries = require('../Queries/Stocks');
 const StockValueQueries = require('../Queries/StockValues');
 
 async function addStock(req, res) {
+  if (Array.isArray(req.body)) {
+    await addStocks(req, res);
+  } else {
+    await addOneStock(req, res);
+  }
+}
+
+/**
+ * Attempts to add a new stock to the DB. If the stock already exists, then just
+ * return the existing stock
+ *
+ * @param {object} req 
+ * @param {object} res 
+ */
+async function addOneStock(req, res) {
   try {
     const stock = new Stock(req.body);
-    const newStock = await StockQueries.addStock(stock);
-    res.json(newStock);
+    const existingStocks = await StockQueries.getStocks({ ticker: stock.ticker });
+    if (isEmpty(existingStocks)) {
+      const newStock = await StockQueries.addStock(stock);
+      res.json(newStock);
+    } else {
+      res.json(existingStocks[0]);
+    }
   } catch (e) {
     res.status(400).json({ message: 'Failed to add new stock.', reason: e.message });
+  }
+}
+
+async function addStocks(req, res) {
+  try {
+    const stocks = req.body.map(s => new Stock(s));
+    const stocksToAdd = [];
+    const resStocks = [];
+    for (const stock of stocks) {
+      const existingStocks = await StockQueries.getStocks({ ticker: stock.ticker });
+      if (isEmpty(existingStocks)) {
+        stocksToAdd.push(stock);
+      } else {
+        resStocks.push(existingStocks[0]);
+      }
+    }
+    const newStocks = await StockQueries.addStocks(stocksToAdd);
+    res.json([...resStocks, ...newStocks].map(s => new Stock(s)));
+  } catch (e) {
+    res.status(400).json({ message: 'Failed to add new stocks.', reason: e.message });
   }
 }
 

@@ -30,8 +30,8 @@ describe('Pick EndPoints', function() {
         .post('/api/picks')
         .set('Authorization', `bearer ${token}`)
         .send({
-          memberId: member.id,
-          stockId: stock.id,
+          email: member.email,
+          ticker: stock.ticker,
           startDate: moment().startOf('day').toDate(),
           position: 'long',
           ratio: 0.12,
@@ -93,6 +93,39 @@ describe('Pick EndPoints', function() {
       expect(deactivateResponse.body.id).to.eql(pick.id);
       const pickResponse = await chai.request(app).get(`/api/picks/${pick.id}`).set('Authorization', `bearer ${token}`);
       expect(pickResponse.body.active).to.be.true;
+    });
+  });
+  describe('Add picks', function () {
+    let member;
+    let abcdStock;
+    let xkcdStock;
+    before(async function () {
+      member = await helpers.addTestMember();
+      abcdStock = await helpers.addTestStock({ ticker: 'ABCD', name: 'ABCD Corp' });
+      xkcdStock = await helpers.addTestStock({ ticker: 'XKCD', name: 'XKCD Corp' });
+      await chai.request(app).patch(`/api/`);
+    });
+    it('should add two picks', async function () {
+      const addPicksRes = await chai.request(app).post('/api/picks')
+        .set('Authorization', `bearer ${token}`)
+        .send([
+          {
+            email: member.email,
+            ticker: abcdStock.ticker,
+            startDate: moment().startOf('day').toDate(),
+            position: 'long',
+            ratio: 0.25,
+          },
+          {
+            email: member.email,
+            ticker: xkcdStock.ticker,
+            startDate: moment().startOf('day').toDate(),
+            position: 'long',
+            ratio: 0.75,
+          }
+        ]);
+      expect(addPicksRes.status).to.eql(200);
+      expect(addPicksRes.body.length).to.eql(2);
     });
   });
 });

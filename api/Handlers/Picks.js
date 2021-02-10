@@ -2,8 +2,26 @@ const Pick = require('../Models/Pick');
 const PickQueries = require('../Queries/Picks');
 
 async function addPick(req, res) {
+  if (Array.isArray(req.body)) {
+    await addPicks(req, res);
+  } else {
+    await addOnePick(req, res);
+  }
+}
+
+async function addPicks(req, res) {
   try {
-    const pick = new Pick(req.body);
+    const picks = req.body.map(p => ({ ...p, startDate: new Date(p.startDate) }));
+    const addedPicks = await PickQueries.addPicks(picks);
+    res.json(addedPicks);
+  } catch (e) {
+    res.status(400).json({ message: 'Failed to add picks.', reason: e.message });
+  }
+}
+
+async function addOnePick(req, res) {
+  try {
+    const pick = req.body;
     const newPick = await PickQueries.addPick({ ...pick, startDate: new Date(pick.startDate) });
     res.json(newPick);
   } catch (e) {
