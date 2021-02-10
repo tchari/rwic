@@ -4,6 +4,7 @@ const auth = require('./Middleware/auth');
 const memberRoutes = require('./Routes/member');
 const stockRoutes = require('./Routes/stock');
 const pickRoutes = require('./Routes/pick');
+const stockValueRoutes = require('./Routes/stockValue');
 const StockValue = require('./Handlers/StockValues');
 const Auth = require('./Handlers/Auth');
 
@@ -21,6 +22,7 @@ app.use('/api', auth);
 app.use('/api/members', memberRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/picks', pickRoutes);
+app.use('/api/stockValues', stockValueRoutes);
 
 /**
  * Stock Value end points

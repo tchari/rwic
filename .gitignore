@@ -3,6 +3,7 @@
 /scratch
 /dumps
 /Picks
+/queries
 
 /api/secrets.json
 /api/node_modules

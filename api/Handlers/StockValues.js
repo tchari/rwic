@@ -4,10 +4,51 @@ const forEach = require('lodash/forEach');
 const find = require('lodash/find');
 const findIndex = require('lodash/findIndex');
 const orderBy = require('lodash/orderBy');
+const yup = require('yup');
 
 const config = require('../config.json');
 const StockValueQueries = require('../Queries/StockValues');
 const Position = require('../Models/Position');
+
+async function addStockValue(req, res) {
+  if (Array.isArray(req.body)) {
+    await addStockValues(req, res);
+  } else {
+    await addOneStockValue(req, res);
+  }
+}
+
+async function addOneStockValue(req, res) {
+  try {
+    const stockValue = req.body();
+    yup.object().shape({
+      ticker: yup.string().required(),
+      value: yup.number().positive().required(),
+      date: yup.date().required(),
+    }).validateSync(stockValue);
+    const newStockValue = await StockValueQueries.addMember(stockValue);
+    res.json(newStockValue);
+  } catch (e) {
+    res.status(400).json({ message: `Failed to add stock value.`, reason: e.message });
+  }
+}
+
+async function addStockValues(req, res) {
+  try {
+    const stockValues = req.body();
+    yup.array().of(
+      yup.object().shape({
+        ticker: yup.string().required(),
+        value: yup.number().positive().required(),
+        date: yup.date().required(),
+      })
+    ).validateSync(stockValues);
+    const newStockValues = await StockValueQueries.addMember(stockValues);
+    res.json(newStockValues);
+  } catch (e) {
+    res.status(400).json({ message: `Failed to add stock values.`, reason: e.message });
+  }
+}
 
 async function getLeaderBoard(req, res) {
   try {
@@ -43,3 +84,4 @@ async function getLeaderBoard(req, res) {
 }
 
 module.exports.getLeaderBoard = getLeaderBoard;
+module.exports.addStockValue = addStockValue;
