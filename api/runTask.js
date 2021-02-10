@@ -1,3 +1,7 @@
 const fetchStockValues = require('./Tasks/fetchStockValue');
 
-fetchStockValues();
+try {
+    fetchStockValues();
+} catch (e) {
+    console.log(e);
+}

@@ -26,7 +26,7 @@ async function addOneStockValue(req, res) {
       value: yup.number().positive().required(),
       date: yup.date().required(),
     }).validateSync(stockValue);
-    const newStockValue = await StockValueQueries.addMember(stockValue);
+    const newStockValue = await StockValueQueries.addStockValue(stockValue);
     res.json(newStockValue);
   } catch (e) {
     res.status(400).json({ message: `Failed to add stock value.`, reason: e.message });
@@ -35,7 +35,7 @@ async function addOneStockValue(req, res) {
 
 async function addStockValues(req, res) {
   try {
-    const stockValues = req.body();
+    const stockValues = req.body;
     yup.array().of(
       yup.object().shape({
         ticker: yup.string().required(),
@@ -43,7 +43,7 @@ async function addStockValues(req, res) {
         date: yup.date().required(),
       })
     ).validateSync(stockValues);
-    const newStockValues = await StockValueQueries.addMember(stockValues);
+    const newStockValues = await StockValueQueries.addStockValues(stockValues);
     res.json(newStockValues);
   } catch (e) {
     res.status(400).json({ message: `Failed to add stock values.`, reason: e.message });
@@ -52,8 +52,9 @@ async function addStockValues(req, res) {
 
 async function getLeaderBoard(req, res) {
   try {
-    const today = moment().startOf('day').toDate()
-    const leaderboardResult = await StockValueQueries.getYearToDateLeaderboard(today);
+    const qm = req.query.date ? moment(req.query.date) : moment();
+    const queryDate = qm.startOf('day').toDate()
+    const leaderboardResult = await StockValueQueries.getYearToDateLeaderboard(queryDate);
     const leaderboard = [];
     leaderboardResult.forEach(({ memberId, firstName, lastName }) => {
       const member = find(leaderboard, { memberId });
@@ -61,12 +62,13 @@ async function getLeaderBoard(req, res) {
         leaderboard.push({ memberId, firstName, lastName, closingValue: 0 });
       }
     });
+    console.log(JSON.stringify(leaderboardResult));
 
     const pickGroups = groupBy(leaderboardResult, 'pickId');
     forEach(pickGroups, group => {
       const startDate = moment(config.thisYearStartDate).toDate();
       const start = find(group, { date: startDate });
-      const latest = find(group, { date: today });
+      const latest = find(group, { date: queryDate });
       const { ratio, value: startValue, memberId, position } = start;
       const latestValue = latest.value;
       const initialInvestment = 1000 * ratio;

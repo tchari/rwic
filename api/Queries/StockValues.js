@@ -3,6 +3,8 @@ const knex = require('./initConnection');
 const tables = require('./tables');
 const config = require('../config.json');
 const StockValue = require('../Models/StockValue');
+const Stock = require('../Models/Stock');
+const { isEmpty } = require('lodash');
 
 const { STOCK_VALUE, STOCK, PICK, MEMBER } = tables;
 
@@ -22,14 +24,20 @@ function init() {
 }
 
 async function addStockValue(stockValue) {
-  const stockValueCode = makeStockValueCode(stockValue);
-  await knex(STOCK_VALUE).insert({ ...stockValue, stockValueCode });
+  const insertableSV = await makeInsertableStockValue(stockValue);
+  const stockValueCode = makeStockValueCode(insertableSV);
+  await knex(STOCK_VALUE).insert({ ...insertableSV, stockValueCode });
   const added = await knex(STOCK_VALUE).select().whereRaw('id = last_insert_id()');
   return new StockValue(added[0]);
 }
 
 async function addStockValues(stockValues) {
-  const valuesToAdd = stockValues.map(v => ({ ...v, stockValueCode: makeStockValueCode(v) }));
+  const insertableSVs = []
+  for (const stockValue of stockValues) {
+    const insertable = await makeInsertableStockValue(stockValue);
+    insertableSVs.push(insertable);
+  }
+  const valuesToAdd = insertableSVs.map(v => ({ ...v, stockValueCode: makeStockValueCode(v) }));
   const result = await knex(STOCK_VALUE).insert(valuesToAdd);
   const firstId = result[0];
   const added = await knex(STOCK_VALUE).select().whereRaw('id >= ? and id < ?', [firstId, firstId + stockValues.length]);
@@ -52,8 +60,10 @@ async function getYearToDateLeaderboard(today) {
     .join(STOCK, `${STOCK_VALUE}.stockId`, '=', `${STOCK}.id`)
     .join(PICK, `${STOCK}.id`, '=', `${PICK}.stockId`)
     .join(MEMBER, `${PICK}.memberId`, '=', `${MEMBER}.id`)
-    .where({ [`${STOCK_VALUE}.date`]: today })
-    .orWhere({ [`${STOCK_VALUE}.date`]: startDate })
+    .where({ [`${PICK}.active`]: 1 })
+    .andWhere(function() {
+      this.where({ [`${STOCK_VALUE}.date`]: today }).orWhere({ [`${STOCK_VALUE}.date`]: startDate })
+    })
     .select(
       'value',
       `${STOCK_VALUE}.stockId`,
@@ -93,6 +103,25 @@ async function getInitialStockValues(stocks) {
 
 function makeStockValueCode(stockValue) {
   return `${stockValue.stockId}-${stockValue.date}`
+}
+
+/**
+ * Allows us to add a stockvalue by ticker instead of stockId
+ * 
+ * @param {object} stockvalue
+ */
+async function makeInsertableStockValue(stockvalue) {
+  const newSV = { ...stockvalue };
+  if (stockvalue.ticker) {
+    const result = await knex(STOCK).select().where('ticker', '=', stockvalue.ticker);
+    if (isEmpty(result)) {
+      throw new Error(`No stock with ticker ${stockvalue.ticker} was found`);
+    }
+    const stock = new Stock(result[0]);
+    newSV.stockId = stock.id;
+    delete newSV.ticker;
+  }
+  return newSV;
 }
 
 module.exports.init = init;

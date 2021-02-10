@@ -28,7 +28,9 @@ async function fetchStockValues() {
   const rawActiveStocks = await StockQueries.getActiveStocks();
   const tickers = rawActiveStocks.filter(stock => allowedMICs.includes(stock.mic)).map(stock => stock.ticker);
   const queryString = qs.stringify({ symbols: tickers, access_key: apiKey }, { arrayFormat: 'comma' });
-  const response = await axios.get(`${baseUrl}/eod/latest?${queryString}`);
+  const url = `${baseUrl}/eod/latest?${queryString}`;
+  console.log(url);
+  const response = await axios.get(url);
   const stockValues = response.data.data.map(datum => {
     const { date, close: value } = datum;
     const stock = find(rawActiveStocks, { ticker: datum.symbol });
